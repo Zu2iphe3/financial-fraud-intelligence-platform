@@ -61,4 +61,6 @@ The complete dataset is intentionally excluded from Git. After downloading it, p
 
 ## Current status
 
-Phase 1 - repository and development foundation.
+Phase 2 - dataset acquisition and exploration.
+
+The complete initial findings and modelling implications are documented in [the PaySim data exploration report](docs/data_exploration.md).
