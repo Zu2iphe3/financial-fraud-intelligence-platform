@@ -1,0 +1,2 @@
+# Preserve document binaries exactly across operating systems.
+*.pdf binary
