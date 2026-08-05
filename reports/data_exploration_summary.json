@@ -1,0 +1,120 @@
+{
+  "source_file": "PS_20174392719_1491204439457_log.csv",
+  "file_size_bytes": 493534783,
+  "rows": 6362620,
+  "columns": [
+    "step",
+    "type",
+    "amount",
+    "nameOrig",
+    "oldbalanceOrg",
+    "newbalanceOrig",
+    "nameDest",
+    "oldbalanceDest",
+    "newbalanceDest",
+    "isFraud",
+    "isFlaggedFraud"
+  ],
+  "dtypes": {
+    "step": "int64",
+    "type": "str",
+    "amount": "float64",
+    "nameOrig": "str",
+    "oldbalanceOrg": "float64",
+    "newbalanceOrig": "float64",
+    "nameDest": "str",
+    "oldbalanceDest": "float64",
+    "newbalanceDest": "float64",
+    "isFraud": "int64",
+    "isFlaggedFraud": "int64"
+  },
+  "missing_values": {
+    "step": 0,
+    "type": 0,
+    "amount": 0,
+    "nameOrig": 0,
+    "oldbalanceOrg": 0,
+    "newbalanceOrig": 0,
+    "nameDest": 0,
+    "oldbalanceDest": 0,
+    "newbalanceDest": 0,
+    "isFraud": 0,
+    "isFlaggedFraud": 0
+  },
+  "step_range": {
+    "minimum": 1,
+    "maximum": 743
+  },
+  "amount": {
+    "minimum": 0.0,
+    "maximum": 92445516.64,
+    "mean": 179861.90354913066
+  },
+  "fraud": {
+    "transactions": 8213,
+    "rate": 0.001290820448180152,
+    "amount_minimum": 0.0,
+    "amount_maximum": 10000000.0,
+    "amount_mean": 1467967.2991403872
+  },
+  "flagged_fraud": {
+    "transactions": 16,
+    "rate": 2.51468734577894e-06
+  },
+  "negative_value_counts": {
+    "amount": 0,
+    "oldbalanceOrg": 0,
+    "newbalanceOrig": 0,
+    "oldbalanceDest": 0,
+    "newbalanceDest": 0
+  },
+  "zero_value_counts": {
+    "amount": 16,
+    "oldbalanceOrg": 2102449,
+    "newbalanceOrig": 3609566,
+    "oldbalanceDest": 2704388,
+    "newbalanceDest": 2439433
+  },
+  "label_values": {
+    "isFraud": {
+      "0": 6354407,
+      "1": 8213
+    },
+    "isFlaggedFraud": {
+      "0": 6362604,
+      "1": 16
+    }
+  },
+  "transaction_types": {
+    "CASH_IN": {
+      "transactions": 1399284,
+      "fraud_transactions": 0,
+      "fraud_rate": 0.0,
+      "flagged_transactions": 0
+    },
+    "CASH_OUT": {
+      "transactions": 2237500,
+      "fraud_transactions": 4116,
+      "fraud_rate": 0.0018395530726256983,
+      "flagged_transactions": 0
+    },
+    "DEBIT": {
+      "transactions": 41432,
+      "fraud_transactions": 0,
+      "fraud_rate": 0.0,
+      "flagged_transactions": 0
+    },
+    "PAYMENT": {
+      "transactions": 2151495,
+      "fraud_transactions": 0,
+      "fraud_rate": 0.0,
+      "flagged_transactions": 0
+    },
+    "TRANSFER": {
+      "transactions": 532909,
+      "fraud_transactions": 4097,
+      "fraud_rate": 0.007687991758442811,
+      "flagged_transactions": 16
+    }
+  }
+}
