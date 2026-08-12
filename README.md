@@ -34,6 +34,12 @@ The project uses the [PaySim synthetic financial dataset](https://www.kaggle.com
 
 The complete dataset is intentionally excluded from Git. After downloading it, place the CSV file under `data/raw/`. A small permitted sample may be added to `data/sample/` later for tests and demonstrations.
 
+Phase 2 documentation:
+
+- [PaySim data dictionary](docs/DATA_DICTIONARY.md)
+- [Exploratory analysis findings](docs/EDA_FINDINGS.md)
+- [Reproducible exploration notebook](notebooks/01_paysim_exploration.ipynb)
+
 ## Technology stack
 
 - Python, SQL, Git, and GitHub
@@ -61,4 +67,4 @@ The complete dataset is intentionally excluded from Git. After downloading it, p
 
 ## Current status
 
-Phase 1 - repository and development foundation.
+Phase 2 - PaySim dataset acquisition and exploration.
