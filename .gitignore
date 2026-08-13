@@ -49,6 +49,8 @@ coverage.xml
 *.py.cover
 .hypothesis/
 .pytest_cache/
+# Ignore the repository-local temporary path used by the earlier Windows pytest workaround.
+.pytest_tmp/
 cover/
 
 # Translations
