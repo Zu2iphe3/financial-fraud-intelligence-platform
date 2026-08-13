@@ -32,6 +32,18 @@ Use one of these formats:
 
 Use lowercase kebab-case after the prefix. Keep names short, specific, and descriptive.
 
+For tracked backlog work, include the lowercase ticket ID in the branch name:
+
+```text
+<type>/<ticket-id>-<short-purpose>
+```
+
+Example:
+
+```text
+feature/ph3-01-postgres-transaction-storage
+```
+
 Examples:
 
 - `feature/paysim-exploration`
