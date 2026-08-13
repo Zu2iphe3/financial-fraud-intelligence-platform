@@ -130,7 +130,8 @@ Before proposing a commit, push, pull request, or merge, confirm as applicable:
 
 - Keep functions small and focused on one responsibility.
 - Prefer clear, explicit code over clever or compressed implementations.
-- Add docstrings or comments where intent, constraints, or tradeoffs are not obvious.
+- Add useful docstrings or comments that explain why important or non-obvious logic exists, especially chunked processing, validation rules, leakage protections, and PaySim-specific calculations.
+- Do not comment every obvious line. Prefer concise explanations of purpose, assumptions, constraints, and tradeoffs that help a learner understand the design.
 - Explain important design decisions before implementing them.
 - Preserve reproducibility for data processing, experiments, and generated reports.
 - Favour maintainable project structure and incremental learning over premature optimization.
