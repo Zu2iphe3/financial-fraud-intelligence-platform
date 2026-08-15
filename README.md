@@ -40,6 +40,10 @@ Phase 2 documentation:
 - [Exploratory analysis findings](docs/EDA_FINDINGS.md)
 - [Reproducible exploration notebook](notebooks/01_paysim_exploration.ipynb)
 
+Phase 3 local database setup:
+
+- [PostgreSQL setup and transaction schema](docs/POSTGRES_SETUP.md)
+
 ## Technology stack
 
 - Python, SQL, Git, and GitHub
@@ -73,4 +77,4 @@ The result appears in the pull request checks as `pytest (Python 3.12)`. A passi
 
 ## Current status
 
-Phase 2 - PaySim dataset acquisition and exploration.
+Phase 3 - Local PostgreSQL transaction storage (in progress).
