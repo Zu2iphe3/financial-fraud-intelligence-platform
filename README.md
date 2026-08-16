@@ -43,6 +43,7 @@ Phase 2 documentation:
 Phase 3 local database setup:
 
 - [PostgreSQL setup and transaction schema](docs/POSTGRES_SETUP.md)
+- [PaySim batch ingestion and reconciliation](docs/PAYSIM_INGESTION.md)
 
 ## Technology stack
 
@@ -58,7 +59,7 @@ Phase 3 local database setup:
 
 ## Automated Python tests
 
-Pull requests targeting `main` and pushes to `main` automatically run the complete pytest suite through GitHub Actions. This checks proposed changes before merge and verifies the resulting `main` branch after a merge or direct push. The workflow creates a clean Ubuntu environment with Python 3.12, restores cached pip downloads where available, installs the dependencies declared in `requirements.txt`, and runs `python -m pytest`.
+Pull requests targeting `main` and pushes to `main` automatically run the complete pytest suite through GitHub Actions. This checks proposed changes before merge and verifies the resulting `main` branch after a merge or direct push. The workflow creates a clean Ubuntu environment with Python 3.12 and a temporary PostgreSQL service, restores cached pip downloads where available, installs the dependencies declared in `requirements.txt`, initializes the transaction schema, and runs `python -m pytest`.
 
 The result appears in the pull request checks as `pytest (Python 3.12)`. A passing suite produces a green check; a failed test produces a failed check whose workflow log identifies the failing test. This initial workflow performs testing only and does not deploy the project.
 
