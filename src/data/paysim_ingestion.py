@@ -118,8 +118,10 @@ class PaySimTransaction:
     is_flagged_fraud: int
     source_file_name: str
 
-    def database_row(self) -> tuple[object, ...]:
-        """Return values in the explicit PostgreSQL staging-column order."""
+    def database_row(self, ingestion_source: str = "batch") -> tuple[object, ...]:
+        """Return values in database order for either approved ingestion path."""
+        if ingestion_source not in {"batch", "kafka"}:
+            raise ValueError("ingestion_source must be 'batch' or 'kafka'")
         return (
             self.transaction_id,
             self.source_dataset_id,
@@ -135,7 +137,7 @@ class PaySimTransaction:
             self.new_balance_dest,
             self.is_fraud,
             self.is_flagged_fraud,
-            "batch",
+            ingestion_source,
             self.source_file_name,
         )
 
