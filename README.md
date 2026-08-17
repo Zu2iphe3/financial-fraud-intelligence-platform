@@ -45,6 +45,10 @@ Phase 3 local database setup:
 - [PostgreSQL setup and transaction schema](docs/POSTGRES_SETUP.md)
 - [PaySim batch ingestion and reconciliation](docs/PAYSIM_INGESTION.md)
 
+Phase 4 local streaming setup:
+
+- [Kafka transaction replay pipeline](docs/KAFKA_STREAMING.md)
+
 ## Technology stack
 
 - Python, SQL, Git, and GitHub
@@ -59,7 +63,7 @@ Phase 3 local database setup:
 
 ## Automated Python tests
 
-Pull requests targeting `main` and pushes to `main` automatically run the complete pytest suite through GitHub Actions. This checks proposed changes before merge and verifies the resulting `main` branch after a merge or direct push. The workflow creates a clean Ubuntu environment with Python 3.12 and a temporary PostgreSQL service, restores cached pip downloads where available, installs the dependencies declared in `requirements.txt`, initializes the transaction schema, and runs `python -m pytest`.
+Pull requests targeting `main` and pushes to `main` automatically run the complete pytest suite through GitHub Actions. This checks proposed changes before merge and verifies the resulting `main` branch after a merge or direct push. The workflow creates a clean Ubuntu environment with Python 3.12, temporary PostgreSQL and Apache Kafka services, restores cached pip downloads where available, installs the dependencies declared in `requirements.txt`, initializes the database schemas and Kafka topic, and runs `python -m pytest`.
 
 The result appears in the pull request checks as `pytest (Python 3.12)`. A passing suite produces a green check; a failed test produces a failed check whose workflow log identifies the failing test. This initial workflow performs testing only and does not deploy the project.
 
@@ -78,4 +82,4 @@ The result appears in the pull request checks as `pytest (Python 3.12)`. A passi
 
 ## Current status
 
-Phase 3 - Local PostgreSQL transaction storage (in progress).
+Phase 4 - Simulated real-time streaming with Kafka (in progress).

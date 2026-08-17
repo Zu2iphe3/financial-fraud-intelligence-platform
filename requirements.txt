@@ -1,4 +1,5 @@
 ipykernel>=6.29,<7.0
+confluent-kafka>=2.6,<3.0
 matplotlib>=3.9,<4.0
 nbconvert>=7.16,<8.0
 nbformat>=5.10,<6.0
