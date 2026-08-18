@@ -1,0 +1,103 @@
+version: 2
+
+sources:
+  - name: raw
+    description: >-
+      Validated PaySim transactions loaded by the Phase 3 batch path or the Phase 4
+      Kafka path. dbt reads this schema but never changes its source records.
+    schema: raw
+    tables:
+      - name: transactions
+        description: >-
+          One row per logical PaySim source row, identified consistently across batch
+          ingestion and Kafka replay.
+        columns:
+          - name: record_id
+            description: PostgreSQL-generated internal record key.
+            data_tests:
+              - unique
+              - not_null
+          - name: transaction_id
+            description: Stable logical PaySim transaction identity.
+            data_tests:
+              - unique
+              - not_null
+          - name: source_dataset_id
+            description: SHA-256 fingerprint of the exact PaySim CSV bytes.
+            data_tests:
+              - not_null
+          - name: source_row_number
+            description: Original one-based data-row number, excluding the CSV header.
+            data_tests:
+              - not_null
+          - name: step
+            description: PaySim simulation hour, starting at 1.
+            data_tests:
+              - not_null
+          - name: transaction_type
+            description: PaySim mobile-money transaction category.
+            data_tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values: [CASH_IN, CASH_OUT, DEBIT, PAYMENT, TRANSFER]
+          - name: amount
+            description: Transaction amount stored as exact NUMERIC(20,2).
+            data_tests:
+              - not_null
+          - name: name_orig
+            description: Synthetic originating account or customer identifier.
+            data_tests:
+              - not_null
+          - name: old_balance_orig
+            description: >-
+              Analysis/audit-only simulator balance. Prohibited as a predictive feature
+              because fraudulent PaySim transactions are cancelled.
+            data_tests:
+              - not_null
+          - name: new_balance_orig
+            description: >-
+              Analysis/audit-only simulator balance. Prohibited as a predictive feature.
+            data_tests:
+              - not_null
+          - name: name_dest
+            description: Synthetic destination account, customer, or merchant identifier.
+            data_tests:
+              - not_null
+          - name: old_balance_dest
+            description: >-
+              Analysis/audit-only simulator balance. Prohibited as a predictive feature.
+            data_tests:
+              - not_null
+          - name: new_balance_dest
+            description: >-
+              Analysis/audit-only simulator balance. Prohibited as a predictive feature.
+            data_tests:
+              - not_null
+          - name: is_fraud
+            description: Ground-truth simulated fraud label retained for evaluation only.
+            data_tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values: [0, 1]
+          - name: is_flagged_fraud
+            description: Ground-truth PaySim rule-engine flag retained for evaluation only.
+            data_tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values: [0, 1]
+          - name: first_ingestion_source
+            description: First successful platform path, either batch or kafka.
+            data_tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values: [batch, kafka]
+          - name: source_file_name
+            description: Optional source filename for operational traceability.
+          - name: ingested_at
+            description: Timestamp when the logical transaction was first stored.
+            data_tests:
+              - not_null

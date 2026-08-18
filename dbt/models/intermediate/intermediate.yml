@@ -1,0 +1,33 @@
+version: 2
+
+models:
+  - name: int_transactions_enriched
+    description: >-
+      Reusable transaction-grain model that adds PaySim simulation-day and hour
+      dimensions plus readable fraud-label booleans. No records are aggregated here.
+    columns:
+      - name: transaction_id
+        description: Stable logical transaction grain.
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_transactions')
+                field: transaction_id
+      - name: simulation_day
+        description: One-based simulated day derived from groups of 24 PaySim steps.
+        data_tests:
+          - not_null
+      - name: simulation_hour_of_day
+        description: One-based simulated hour within a day, from 1 through 24.
+        data_tests:
+          - not_null
+      - name: is_fraudulent
+        description: Readable boolean form of the ground-truth is_fraud label.
+        data_tests:
+          - not_null
+      - name: is_flagged_fraudulent
+        description: Readable boolean form of the PaySim is_flagged_fraud output.
+        data_tests:
+          - not_null
