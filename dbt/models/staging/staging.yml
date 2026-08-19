@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: stg_transactions
+    description: >-
+      One row per raw PaySim transaction with intentional names and PostgreSQL types.
+      This view preserves source meaning and record count without business aggregation.
+    columns:
+      - name: transaction_id
+        description: Stable transaction grain shared by every ingestion path.
+        data_tests:
+          - unique
+          - not_null
+      - name: source_dataset_id
+        description: Exact source-file fingerprint.
+        data_tests:
+          - not_null
+      - name: source_row_number
+        description: Original one-based PaySim data-row number.
+        data_tests:
+          - not_null
+      - name: step
+        description: PaySim simulation hour.
+        data_tests:
+          - not_null
+      - name: transaction_type
+        description: Normalized transaction category.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [CASH_IN, CASH_OUT, DEBIT, PAYMENT, TRANSFER]
+      - name: amount
+        description: Exact transaction amount.
+        data_tests:
+          - not_null
+      - name: old_balance_orig
+        description: Analysis/audit only; prohibited as a predictive feature.
+      - name: new_balance_orig
+        description: Analysis/audit only; prohibited as a predictive feature.
+      - name: old_balance_dest
+        description: Analysis/audit only; prohibited as a predictive feature.
+      - name: new_balance_dest
+        description: Analysis/audit only; prohibited as a predictive feature.
+      - name: is_fraud
+        description: Ground-truth label for evaluation, never an inference input.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+      - name: is_flagged_fraud
+        description: PaySim rule-engine output retained for evaluation.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1]

@@ -49,6 +49,10 @@ Phase 4 local streaming setup:
 
 - [Kafka transaction replay pipeline](docs/KAFKA_STREAMING.md)
 
+Phase 5 analytics engineering:
+
+- [dbt fraud analytics layer](docs/DBT_ANALYTICS.md)
+
 ## Technology stack
 
 - Python, SQL, Git, and GitHub
@@ -82,4 +86,4 @@ The result appears in the pull request checks as `pytest (Python 3.12)`. A passi
 
 ## Current status
 
-Phase 4 - Simulated real-time streaming with Kafka (in progress).
+Phase 5 - Analytics engineering with dbt Core (in progress).

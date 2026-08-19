@@ -1,0 +1,139 @@
+version: 2
+
+models:
+  - name: fct_transactions
+    description: >-
+      Trusted transaction analytics mart at exactly one row per transaction_id. It
+      supports analytics and later consumers without requiring them to query raw tables.
+    columns:
+      - name: transaction_id
+        description: Unique logical transaction grain.
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('int_transactions_enriched')
+                field: transaction_id
+      - name: source_dataset_id
+        description: Exact PaySim source-file fingerprint.
+      - name: source_row_number
+        description: Original one-based PaySim data-row number.
+      - name: step
+        description: Original PaySim simulation hour.
+      - name: simulation_day
+        description: One-based simulated day derived from the PaySim step.
+        data_tests:
+          - not_null
+      - name: simulation_hour_of_day
+        description: One-based simulated hour within the day.
+        data_tests:
+          - not_null
+      - name: transaction_type
+        description: Mobile-money transaction category.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [CASH_IN, CASH_OUT, DEBIT, PAYMENT, TRANSFER]
+      - name: amount
+        description: Exact transaction amount.
+        data_tests:
+          - not_null
+      - name: name_orig
+        description: Synthetic origin identifier.
+      - name: name_dest
+        description: Synthetic destination identifier.
+      - name: old_balance_orig
+        description: Analysis/audit only; prohibited as a predictive feature.
+      - name: new_balance_orig
+        description: Analysis/audit only; prohibited as a predictive feature.
+      - name: old_balance_dest
+        description: Analysis/audit only; prohibited as a predictive feature.
+      - name: new_balance_dest
+        description: Analysis/audit only; prohibited as a predictive feature.
+      - name: is_fraud
+        description: Ground-truth label retained for evaluation, not inference input.
+      - name: is_fraudulent
+        description: Boolean form of the ground-truth fraud label.
+      - name: is_flagged_fraud
+        description: PaySim rule-engine result retained for evaluation.
+      - name: is_flagged_fraudulent
+        description: Boolean form of the PaySim rule-engine result.
+      - name: first_ingestion_source
+        description: First successful platform ingestion path.
+      - name: source_file_name
+        description: Optional source filename for traceability.
+      - name: ingested_at
+        description: First successful platform ingestion timestamp.
+
+  - name: mart_fraud_by_day
+    description: >-
+      Fraud-monitoring mart at one row per simulated PaySim day. It deliberately exposes
+      the partial final day so its unusual volume and fraud rate remain visible.
+    columns:
+      - name: simulation_day
+        description: Unique one-based simulated day; this is the mart grain.
+        data_tests:
+          - unique
+          - not_null
+      - name: first_step
+        description: First PaySim step observed for the day.
+      - name: last_step
+        description: Last PaySim step observed for the day.
+      - name: hours_observed
+        description: Number of distinct PaySim hours represented in the day.
+      - name: is_partial_day
+        description: True when fewer than 24 simulated hours are present.
+        data_tests:
+          - not_null
+      - name: transaction_count
+        description: Number of transactions during the simulated day.
+        data_tests:
+          - not_null
+      - name: transaction_amount
+        description: Total transaction amount during the simulated day.
+      - name: fraud_count
+        description: Number of ground-truth fraudulent transactions during the day.
+        data_tests:
+          - not_null
+      - name: fraud_amount
+        description: Total amount of ground-truth fraudulent transactions during the day.
+      - name: flagged_fraud_count
+        description: Number of transactions flagged by the PaySim rule engine.
+      - name: fraud_rate
+        description: Fraud count divided by transaction count, expressed from 0 to 1.
+        data_tests:
+          - not_null
+
+  - name: mart_fraud_by_transaction_type
+    description: >-
+      Fraud-monitoring mart at one row per transaction_type, exposing stable count,
+      amount, fraud, flagged-fraud, and fraud-rate measures.
+    columns:
+      - name: transaction_type
+        description: Unique transaction category; this is the mart grain.
+        data_tests:
+          - unique
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [CASH_IN, CASH_OUT, DEBIT, PAYMENT, TRANSFER]
+      - name: transaction_count
+        description: Number of transactions in the category.
+        data_tests:
+          - not_null
+      - name: transaction_amount
+        description: Total transaction amount in the category.
+      - name: fraud_count
+        description: Number of ground-truth fraudulent transactions in the category.
+        data_tests:
+          - not_null
+      - name: fraud_amount
+        description: Total fraudulent transaction amount in the category.
+      - name: flagged_fraud_count
+        description: Number flagged by the PaySim rule engine in the category.
+      - name: fraud_rate
+        description: Fraud count divided by transaction count, expressed from 0 to 1.
+        data_tests:
+          - not_null
