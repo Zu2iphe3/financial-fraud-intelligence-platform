@@ -53,6 +53,10 @@ Phase 5 analytics engineering:
 
 - [dbt fraud analytics layer](docs/DBT_ANALYTICS.md)
 
+Phase 6 batch orchestration:
+
+- [Airflow batch pipeline runbook](docs/AIRFLOW_RUNBOOK.md)
+
 ## Technology stack
 
 - Python, SQL, Git, and GitHub
@@ -66,6 +70,14 @@ Phase 5 analytics engineering:
 - pytest, dbt tests, and GitHub Actions
 
 ## Automated Python tests
+
+On Windows, keep pytest's temporary fixture directories inside the repository to avoid permission problems with the system temporary directory:
+
+```powershell
+python -m pytest --basetemp=.pytest_tmp/pytest
+```
+
+The `.pytest_tmp/` directory is ignored by Git. This changes only where pytest stores temporary test files; it does not change which tests run or application behavior.
 
 Pull requests targeting `main` and pushes to `main` automatically run the complete pytest suite through GitHub Actions. This checks proposed changes before merge and verifies the resulting `main` branch after a merge or direct push. The workflow creates a clean Ubuntu environment with Python 3.12, temporary PostgreSQL and Apache Kafka services, restores cached pip downloads where available, installs the dependencies declared in `requirements.txt`, initializes the database schemas and Kafka topic, and runs `python -m pytest`.
 
@@ -86,4 +98,4 @@ The result appears in the pull request checks as `pytest (Python 3.12)`. A passi
 
 ## Current status
 
-Phase 5 - Analytics engineering with dbt Core (in progress).
+Phase 6 - Batch workflow orchestration with Apache Airflow (in progress).
