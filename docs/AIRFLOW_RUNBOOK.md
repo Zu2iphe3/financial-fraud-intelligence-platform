@@ -23,14 +23,24 @@ does not make them safe predictive features.
 
 ## One-time local setup
 
-1. Copy `.env.example` to `.env` if a local file does not already exist.
+1. From the repository root, create the local environment file if it does not already
+   exist:
+
+   ```powershell
+   Copy-Item .env.example .env
+   ```
+
 2. Keep the existing PostgreSQL values that work for the batch ingestion.
-3. Replace both Airflow password placeholders with local-only passwords. Use URL-safe
-   characters for `AIRFLOW_DB_PASSWORD`.
-4. Replace `AIRFLOW_API_JWT_SECRET` with one random value of at least 64 characters.
-   Airflow services share it to authenticate task execution; never commit the real value.
-5. Confirm that one PaySim CSV exists under `data/raw/`.
-6. Ensure Docker Desktop is running.
+3. Replace `AIRFLOW_DB_PASSWORD` with a local-only, URL-safe password for the Airflow
+   metadata database.
+4. Replace `AIRFLOW_ADMIN_PASSWORD` with a separate local-only password for signing in
+   to the Airflow UI.
+5. Replace `AIRFLOW_API_JWT_SECRET` with one random local value of at least 64 characters.
+   Every Airflow service must receive the same value so task execution can be authenticated.
+6. Never commit or share the populated `.env` file. The values in `.env.example` are
+   documentation placeholders and must not be used as real credentials.
+7. Confirm that one PaySim CSV exists under `data/raw/`.
+8. Ensure Docker Desktop is running.
 
 The real `.env`, raw CSV, Airflow logs, and both PostgreSQL data volumes are excluded
 from Git. Airflow uses a dedicated metadata database so DAG history does not mix with
