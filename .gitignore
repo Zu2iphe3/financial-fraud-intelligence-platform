@@ -171,6 +171,8 @@ docs/Financial_Fraud_Intelligence_Platform_Project_Plan.pdf
 mlruns/
 artifacts/
 chroma_db/
+airflow/logs/
+airflow/config/
 
 # dbt-generated documentation, compiled SQL, downloaded packages, and logs
 dbt/target/

@@ -1,0 +1,6 @@
+# The Airflow image installs dependencies only; project code and raw data are mounted read-only.
+**
+!airflow/
+airflow/**
+!airflow/Dockerfile
+!airflow/requirements.txt
