@@ -57,6 +57,10 @@ Phase 6 batch orchestration:
 
 - [Airflow batch pipeline runbook](docs/AIRFLOW_RUNBOOK.md)
 
+Phase 7 machine-learning preparation:
+
+- [Leakage-safe modelling dataset](docs/MODELLING_DATASET.md)
+
 ## Technology stack
 
 - Python, SQL, Git, and GitHub
@@ -98,4 +102,4 @@ The result appears in the pull request checks as `pytest (Python 3.12)`. A passi
 
 ## Current status
 
-Phase 6 - Batch workflow orchestration with Apache Airflow (in progress).
+Phase 7 - Leakage-safe fraud feature pipeline (in progress).
