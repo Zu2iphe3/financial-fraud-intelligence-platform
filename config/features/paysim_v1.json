@@ -1,0 +1,130 @@
+{
+  "contract_version": "paysim_features_v1",
+  "source_relation": "analytics_marts.fct_transactions",
+  "predictive_source_columns": [
+    "amount",
+    "transaction_type"
+  ],
+  "target_column": "is_fraud",
+  "metadata_columns": [
+    "transaction_id",
+    "source_dataset_id",
+    "source_row_number",
+    "step",
+    "simulation_day"
+  ],
+  "transaction_types": [
+    "CASH_IN",
+    "CASH_OUT",
+    "DEBIT",
+    "PAYMENT",
+    "TRANSFER"
+  ],
+  "features": [
+    {
+      "name": "amount_log1p",
+      "source_columns": ["amount"],
+      "transformation": "log1p",
+      "dtype": "float32"
+    },
+    {
+      "name": "transaction_type_cash_in",
+      "source_columns": ["transaction_type"],
+      "transformation": "one_hot",
+      "value": "CASH_IN",
+      "dtype": "int8"
+    },
+    {
+      "name": "transaction_type_cash_out",
+      "source_columns": ["transaction_type"],
+      "transformation": "one_hot",
+      "value": "CASH_OUT",
+      "dtype": "int8"
+    },
+    {
+      "name": "transaction_type_debit",
+      "source_columns": ["transaction_type"],
+      "transformation": "one_hot",
+      "value": "DEBIT",
+      "dtype": "int8"
+    },
+    {
+      "name": "transaction_type_payment",
+      "source_columns": ["transaction_type"],
+      "transformation": "one_hot",
+      "value": "PAYMENT",
+      "dtype": "int8"
+    },
+    {
+      "name": "transaction_type_transfer",
+      "source_columns": ["transaction_type"],
+      "transformation": "one_hot",
+      "value": "TRANSFER",
+      "dtype": "int8"
+    }
+  ],
+  "prohibited_predictive_sources": [
+    "oldbalanceOrg",
+    "newbalanceOrig",
+    "oldbalanceDest",
+    "newbalanceDest",
+    "old_balance_orig",
+    "new_balance_orig",
+    "old_balance_dest",
+    "new_balance_dest",
+    "isFraud",
+    "is_fraud",
+    "is_fraudulent",
+    "isFlaggedFraud",
+    "is_flagged_fraud",
+    "is_flagged_fraudulent",
+    "nameOrig",
+    "nameDest",
+    "name_orig",
+    "name_dest",
+    "transaction_id",
+    "source_dataset_id",
+    "source_row_number",
+    "first_ingestion_source",
+    "source_file_name",
+    "ingested_at",
+    "step",
+    "simulation_day",
+    "simulation_hour_of_day"
+  ],
+  "splits": [
+    {
+      "name": "train",
+      "first_step": 1,
+      "last_step": 432,
+      "expected_rows": 6008416,
+      "expected_fraud_rows": 4857
+    },
+    {
+      "name": "validation",
+      "first_step": 433,
+      "last_step": 576,
+      "expected_rows": 192778,
+      "expected_fraud_rows": 1516
+    },
+    {
+      "name": "test",
+      "first_step": 577,
+      "last_step": 743,
+      "expected_rows": 161426,
+      "expected_fraud_rows": 1840
+    }
+  ],
+  "final_day": {
+    "simulation_day": 31,
+    "first_step": 721,
+    "last_step": 743,
+    "evaluation_cohort": "final_day_artifact"
+  },
+  "expected_dataset": {
+    "total_rows": 6362620,
+    "fraud_rows": 8213,
+    "final_day_rows": 272,
+    "final_day_fraud_rows": 272
+  }
+}
