@@ -163,6 +163,8 @@ venv.bak/
 # Keep large/raw PaySim files off GitHub. The negation keeps the folder marker.
 data/raw/*
 !data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
 
 # Local project specification
 docs/Financial_Fraud_Intelligence_Platform_Project_Plan.pdf
