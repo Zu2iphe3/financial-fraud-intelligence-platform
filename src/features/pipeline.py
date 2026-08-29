@@ -66,6 +66,16 @@ def transform_features(frame: pd.DataFrame, contract: FeatureContract) -> pd.Dat
             values = (frame[definition.source_columns[0]] == definition.value).astype(
                 definition.dtype
             )
+        elif definition.transformation == "precomputed_history":
+            # Stateful features are computed by the chronological v2 engine. This
+            # transformer only enforces their reviewed names, order, and dtypes.
+            if definition.name not in frame:
+                raise FeaturePipelineError(
+                    f"Missing precomputed feature column: {definition.name}"
+                )
+            values = pd.to_numeric(frame[definition.name], errors="raise").astype(
+                definition.dtype
+            )
         else:  # The contract validator prevents this defensive branch in normal use.
             raise FeaturePipelineError(
                 f"Unsupported transformation {definition.transformation!r}"

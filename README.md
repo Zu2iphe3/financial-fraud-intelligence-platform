@@ -57,9 +57,13 @@ Phase 6 batch orchestration:
 
 - [Airflow batch pipeline runbook](docs/AIRFLOW_RUNBOOK.md)
 
-Phase 7 machine-learning preparation:
+Phase 7 machine learning and experiment tracking:
 
 - [Leakage-safe modelling dataset](docs/MODELLING_DATASET.md)
+- [Leakage-safe behavioural modelling dataset review](docs/MODELLING_DATASET_V2.md)
+- [Fraud model training, selection, and evaluation](docs/MODEL_TRAINING.md)
+- [ML fraud detection learning notes](docs/ML_FRAUD_DETECTION_LEARNING_NOTES.md)
+- [Non-selected PH7-02 experiment evidence](docs/experiments/PH7_02_EXPERIMENT_EVIDENCE.md)
 
 ## Technology stack
 
@@ -102,4 +106,4 @@ The result appears in the pull request checks as `pytest (Python 3.12)`. A passi
 
 ## Current status
 
-Phase 7 - Leakage-safe fraud feature pipeline (in progress).
+Phase 7 - Fraud model training and experiment tracking (in progress).

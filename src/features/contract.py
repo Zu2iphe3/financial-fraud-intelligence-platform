@@ -12,7 +12,11 @@ from typing import Any, Mapping
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CONTRACT_PATH = REPOSITORY_ROOT / "config" / "features" / "paysim_v1.json"
 _RELATION_PATTERN = re.compile(r"^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*$")
-_SUPPORTED_TRANSFORMATIONS = {"log1p", "one_hot"}
+_SUPPORTED_TRANSFORMATIONS = {
+    "log1p",
+    "one_hot",
+    "precomputed_history",
+}
 _SUPPORTED_DTYPES = {"float32", "int8"}
 
 
@@ -69,6 +73,7 @@ class FeatureContract:
     contract_version: str
     source_relation: str
     predictive_source_columns: tuple[str, ...]
+    internal_grouping_columns: tuple[str, ...]
     target_column: str
     metadata_columns: tuple[str, ...]
     transaction_types: tuple[str, ...]
@@ -89,6 +94,7 @@ class FeatureContract:
         return (
             *self.metadata_columns,
             *self.predictive_source_columns,
+            *self.internal_grouping_columns,
             self.target_column,
         )
 
@@ -132,6 +138,7 @@ def parse_feature_contract(document: Mapping[str, Any]) -> FeatureContract:
             predictive_source_columns=tuple(
                 _required(document, "predictive_source_columns")
             ),
+            internal_grouping_columns=tuple(document.get("internal_grouping_columns", [])),
             target_column=str(_required(document, "target_column")),
             metadata_columns=tuple(_required(document, "metadata_columns")),
             transaction_types=tuple(_required(document, "transaction_types")),
@@ -177,15 +184,20 @@ def validate_feature_contract(contract: FeatureContract) -> None:
         problems.append("predictive source allowlist contains a prohibited field")
 
     allowed_sources = set(contract.predictive_source_columns)
+    internal_sources = set(contract.internal_grouping_columns)
+    if internal_sources - contract.prohibited_predictive_sources:
+        problems.append("internal grouping columns must remain prohibited predictive outputs")
     for feature in contract.features:
         dependencies = set(feature.source_columns)
         prohibited = sorted(dependencies & contract.prohibited_predictive_sources)
-        if prohibited:
+        history_feature = feature.transformation == "precomputed_history"
+        permitted_internal = internal_sources if history_feature else set()
+        if set(prohibited) - permitted_internal:
             problems.append(
                 f"feature {feature.name!r} depends on prohibited source(s): "
-                + ", ".join(prohibited)
+                + ", ".join(sorted(set(prohibited) - permitted_internal))
             )
-        unexpected = sorted(dependencies - allowed_sources)
+        unexpected = sorted(dependencies - allowed_sources - permitted_internal)
         if unexpected:
             problems.append(
                 f"feature {feature.name!r} depends on source(s) outside the allowlist: "
@@ -209,6 +221,10 @@ def validate_feature_contract(contract: FeatureContract) -> None:
                 problems.append(
                     f"feature {feature.name!r} has unsupported category {feature.value!r}"
                 )
+        if history_feature and not (dependencies & internal_sources):
+            problems.append(
+                f"feature {feature.name!r} past-only history requires an internal grouping key"
+            )
 
     expected_split_names = ("train", "validation", "test")
     if tuple(split.name for split in contract.splits) != expected_split_names:

@@ -74,7 +74,7 @@ periods and could allow repeated patterns to appear on both sides of an evaluati
 |---|---:|---:|---|
 | Train | 1–18 | 1–432 | Fit future preprocessing state and models. |
 | Validation | 19–24 | 433–576 | Tune and compare future models. |
-| Test | 25–31 | 577–743 | Final untouched evaluation period. |
+| Test | 25–31 | 577–743 | Held-out evaluation period; later used by v1 PH7-02 only after validation selection. |
 
 The ranges are contiguous, non-overlapping, and ordered. The generator fails if the
 trusted source does not cover the configured ranges or if a row cannot be assigned
