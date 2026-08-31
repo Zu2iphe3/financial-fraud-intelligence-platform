@@ -1,0 +1,24 @@
+{
+  "search_version": "paysim_xgboost_search_v2",
+  "experiment_name": "paysim-fraud-paysim_features_v2-xgboost-search",
+  "primary_metric": "validation_pr_auc",
+  "n_estimators": 800,
+  "early_stopping_rounds": 50,
+  "n_jobs": 4,
+  "reference_recall_targets": [0.5, 0.75, 0.8, 0.9],
+  "daily_top_k_capacities": [100, 500, 1000, 2000],
+  "trials": [
+    {"name": "untuned_reference", "max_depth": 6, "min_child_weight": 10.0, "learning_rate": 0.05, "subsample": 0.8, "colsample_bytree": 1.0, "reg_alpha": 0.1, "reg_lambda": 5.0, "scale_pos_weight": 100.0},
+    {"name": "depth_3_weight_50", "max_depth": 3, "min_child_weight": 10.0, "learning_rate": 0.05, "subsample": 0.8, "colsample_bytree": 1.0, "reg_alpha": 0.1, "reg_lambda": 5.0, "scale_pos_weight": 50.0},
+    {"name": "depth_4_weight_50", "max_depth": 4, "min_child_weight": 10.0, "learning_rate": 0.05, "subsample": 0.8, "colsample_bytree": 1.0, "reg_alpha": 0.1, "reg_lambda": 5.0, "scale_pos_weight": 50.0},
+    {"name": "depth_6_weight_50", "max_depth": 6, "min_child_weight": 10.0, "learning_rate": 0.05, "subsample": 0.8, "colsample_bytree": 1.0, "reg_alpha": 0.1, "reg_lambda": 5.0, "scale_pos_weight": 50.0},
+    {"name": "depth_8_weight_50", "max_depth": 8, "min_child_weight": 10.0, "learning_rate": 0.05, "subsample": 0.8, "colsample_bytree": 1.0, "reg_alpha": 0.1, "reg_lambda": 5.0, "scale_pos_weight": 50.0},
+    {"name": "depth_6_weight_25", "max_depth": 6, "min_child_weight": 10.0, "learning_rate": 0.05, "subsample": 0.8, "colsample_bytree": 1.0, "reg_alpha": 0.1, "reg_lambda": 5.0, "scale_pos_weight": 25.0},
+    {"name": "depth_6_weight_200", "max_depth": 6, "min_child_weight": 10.0, "learning_rate": 0.05, "subsample": 0.8, "colsample_bytree": 1.0, "reg_alpha": 0.1, "reg_lambda": 5.0, "scale_pos_weight": 200.0},
+    {"name": "low_child_weight", "max_depth": 6, "min_child_weight": 2.0, "learning_rate": 0.05, "subsample": 0.8, "colsample_bytree": 1.0, "reg_alpha": 0.1, "reg_lambda": 5.0, "scale_pos_weight": 50.0},
+    {"name": "high_child_weight", "max_depth": 6, "min_child_weight": 30.0, "learning_rate": 0.05, "subsample": 0.8, "colsample_bytree": 1.0, "reg_alpha": 0.1, "reg_lambda": 5.0, "scale_pos_weight": 50.0},
+    {"name": "slower_regularized", "max_depth": 6, "min_child_weight": 10.0, "learning_rate": 0.03, "subsample": 0.8, "colsample_bytree": 1.0, "reg_alpha": 0.5, "reg_lambda": 10.0, "scale_pos_weight": 50.0},
+    {"name": "faster_column_sample", "max_depth": 6, "min_child_weight": 10.0, "learning_rate": 0.08, "subsample": 0.8, "colsample_bytree": 0.8, "reg_alpha": 0.1, "reg_lambda": 5.0, "scale_pos_weight": 50.0},
+    {"name": "full_sample_regularized", "max_depth": 6, "min_child_weight": 10.0, "learning_rate": 0.05, "subsample": 1.0, "colsample_bytree": 1.0, "reg_alpha": 0.5, "reg_lambda": 10.0, "scale_pos_weight": 50.0}
+  ]
+}

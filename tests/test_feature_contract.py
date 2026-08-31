@@ -2,6 +2,7 @@
 
 import copy
 import json
+from pathlib import Path
 
 import pytest
 
@@ -117,3 +118,43 @@ def test_contract_requires_expected_partition_counts_to_reconcile():
 
     with pytest.raises(FeatureContractError, match="reconcile to expected total rows"):
         parse_feature_contract(document)
+
+
+def test_v2_internal_grouping_exception_does_not_allow_balance_leakage():
+    document = json.loads(Path("config/features/paysim_v2.json").read_text(encoding="utf-8"))
+    document["features"].append(
+        {
+            "name": "unsafe_history",
+            "source_columns": ["name_dest", "old_balance_orig"],
+            "transformation": "precomputed_history",
+            "dtype": "float32",
+        }
+    )
+
+    with pytest.raises(FeatureContractError, match="unsafe_history.*old_balance_orig"):
+        parse_feature_contract(document)
+
+
+def test_final_v2_contract_contains_only_approved_behavioural_features():
+    contract = load_feature_contract("config/features/paysim_v2.json")
+
+    assert len(contract.feature_names) == 20
+    assert not {
+        "relationship_prior_count_log1p",
+        "is_new_origin_dest_relationship",
+        "isolation_forest_anomaly_percentile",
+        "anomaly_history_available",
+    } & set(contract.feature_names)
+
+
+def test_rejected_candidates_remain_evidence_only():
+    evidence = json.loads(
+        Path("config/experiments/paysim_rejected_feature_candidates_v1.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert evidence["normal_pipeline_dependency"] is False
+    assert evidence["test_partition_loaded"] is False
+    assert evidence["relationship_features"]["decision"] == "excluded_from_selected_contract"
+    assert evidence["isolation_forest"]["decision"] == "excluded_from_selected_contract"
