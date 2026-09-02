@@ -1,0 +1,22 @@
+{
+  "amount_log1p": 8.570083618164062,
+  "transaction_type_cash_in": 0,
+  "transaction_type_cash_out": 0,
+  "transaction_type_debit": 0,
+  "transaction_type_payment": 0,
+  "transaction_type_transfer": 1,
+  "dest_tx_count_log1p_24h": 0.0,
+  "dest_tx_count_log1p_168h": 0.0,
+  "dest_amount_sum_log1p_24h": 0.0,
+  "dest_amount_sum_log1p_168h": 0.0,
+  "dest_unique_origins_log1p_24h": 0.0,
+  "dest_unique_origins_log1p_168h": 0.0,
+  "dest_hours_since_previous_activity": 744.0,
+  "dest_history_available": 0,
+  "amount_log_ratio_to_dest_mean_168h": 0.0,
+  "dest_cash_in_count_log1p_24h": 0.0,
+  "dest_cash_out_count_log1p_24h": 0.0,
+  "dest_debit_count_log1p_24h": 0.0,
+  "dest_payment_count_log1p_24h": 0.0,
+  "dest_transfer_count_log1p_24h": 0.0
+}
