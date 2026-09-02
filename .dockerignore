@@ -4,3 +4,18 @@
 airflow/**
 !airflow/Dockerfile
 !airflow/requirements.txt
+
+# PH8-01 builds application code and committed contracts into the scoring image.
+# The generated model remains excluded and is mounted read-only at runtime.
+!api/
+!api/**
+!src/
+!src/**
+# Local bytecode can exist after tests but must not enter the runtime image.
+src/**/__pycache__/
+src/**/*.py[cod]
+!config/
+!config/api/
+!config/api/**
+!config/features/
+!config/features/paysim_v2.json

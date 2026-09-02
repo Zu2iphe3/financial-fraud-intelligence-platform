@@ -65,6 +65,10 @@ Phase 7 machine learning and experiment tracking:
 - [ML fraud detection learning notes](docs/ML_FRAUD_DETECTION_LEARNING_NOTES.md)
 - [Non-selected PH7-02 experiment evidence](docs/experiments/PH7_02_EXPERIMENT_EVIDENCE.md)
 
+Phase 8 prediction serving:
+
+- [FastAPI fraud model scoring service](docs/PREDICTION_API.md)
+
 ## Technology stack
 
 - Python, SQL, Git, and GitHub
@@ -106,4 +110,4 @@ The result appears in the pull request checks as `pytest (Python 3.12)`. A passi
 
 ## Current status
 
-Phase 7 - Fraud model training and experiment tracking (in progress).
+Phase 8 - Fraud prediction API (in progress).

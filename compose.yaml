@@ -107,6 +107,31 @@ services:
       - "1"
     restart: "no"
 
+  fraud-api:
+    profiles: [api]
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    environment:
+      FRAUD_MODEL_ARTIFACT_PATH: /opt/app/model
+    ports:
+      - "${FRAUD_API_PORT:-8000}:8000"
+    volumes:
+      - ${FRAUD_MODEL_ARTIFACT_HOST_PATH:-./artifacts/models/paysim_fraud_model_v2_scoring}:/opt/app/model:ro
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import urllib.request;
+          urllib.request.urlopen('http://localhost:8000/health/ready', timeout=3)
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
   airflow-postgres:
     image: postgres:18.4-bookworm
     profiles: [airflow]

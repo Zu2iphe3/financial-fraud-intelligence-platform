@@ -1,0 +1,21 @@
+{
+  "service_name": "PaySim fraud model scoring API",
+  "service_version": "ph8-01-v1",
+  "model": {
+    "artifact_path": "artifacts/models/paysim_fraud_model_v2_scoring",
+    "feature_contract_path": "config/features/paysim_v2.json",
+    "model_version": "paysim_fraud_model_v2_tuned_review",
+    "selected_model": "xgboost_high_child_weight",
+    "mlflow_run_id": "acd17ad55f8e4c2a85d0afedb3608a04",
+    "mlflow_artifact_path": "validation/candidate_estimator.joblib",
+    "mlflow_feature_names_artifact_path": "validation/model_explanation.csv",
+    "mlflow_feature_contract_sha256": "6ed53e0caee1d2f4cb974090063f551a2b351d6dcbabc901a4e0f0d49014df8e"
+  },
+  "risk_policy": {
+    "policy_version": "paysim-v2-validation-review-v1",
+    "status": "portfolio_review_only_not_production_approved",
+    "moderate_min_probability": 0.16269934177398682,
+    "high_min_probability": 0.49207180738449097,
+    "evidence": "PH7-02 validation recall-at-least-75-percent and maximum-F1 review points"
+  }
+}
