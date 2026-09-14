@@ -69,6 +69,10 @@ Phase 8 prediction serving:
 
 - [FastAPI fraud model scoring service](docs/PREDICTION_API.md)
 
+Phase 9 RAG analyst assistant:
+
+- [Fictional fraud-policy knowledge base](docs/FRAUD_POLICY_KNOWLEDGE_BASE.md)
+
 ## Technology stack
 
 - Python, SQL, Git, and GitHub
@@ -110,4 +114,4 @@ The result appears in the pull request checks as `pytest (Python 3.12)`. A passi
 
 ## Current status
 
-Phase 8 - Fraud prediction API (in progress).
+Phase 9 - RAG analyst assistant (in progress).
