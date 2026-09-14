@@ -1,0 +1,100 @@
+{
+  "corpus_id": "ffip-fraud-policy-corpus-v1",
+  "title": "Financial Fraud Intelligence Platform fictional policy corpus",
+  "version": "1.0.0",
+  "fictional": true,
+  "fictional_organization": "Harborline Pay",
+  "documents": [
+    {
+      "source_id": "fraud-investigation-policy-v1",
+      "title": "Fraud Investigation Policy",
+      "path": "policies/fraud-investigation-policy.md",
+      "document_type": "policy",
+      "version": "1.0.0",
+      "domains": ["fraud_investigation"],
+      "sections": [
+        {"section_id": "INV-01", "heading": "Purpose and boundaries"},
+        {"section_id": "INV-02", "heading": "Investigation principles"},
+        {"section_id": "INV-03", "heading": "Alert intake and triage"},
+        {"section_id": "INV-04", "heading": "Investigation actions"},
+        {"section_id": "INV-05", "heading": "Escalation indicators"},
+        {"section_id": "INV-06", "heading": "Evidence and case outcomes"},
+        {"section_id": "INV-07", "heading": "Fictional responsibilities"}
+      ]
+    },
+    {
+      "source_id": "fraud-escalation-policy-v1",
+      "title": "Fraud Escalation Policy",
+      "path": "policies/fraud-escalation-policy.md",
+      "document_type": "policy",
+      "version": "1.0.0",
+      "domains": ["escalation"],
+      "sections": [
+        {"section_id": "ESC-01", "heading": "Purpose and boundaries"},
+        {"section_id": "ESC-02", "heading": "Escalation levels"},
+        {"section_id": "ESC-03", "heading": "Escalation conditions"},
+        {"section_id": "ESC-04", "heading": "Decision and hand-off process"},
+        {"section_id": "ESC-05", "heading": "Information required for escalation"},
+        {"section_id": "ESC-06", "heading": "Closure and feedback"}
+      ]
+    },
+    {
+      "source_id": "analyst-investigation-guide-v1",
+      "title": "Fraud Analyst Investigation Guide",
+      "path": "guides/analyst-investigation-guide.md",
+      "document_type": "guide",
+      "version": "1.0.0",
+      "domains": ["analyst_guidance"],
+      "sections": [
+        {"section_id": "GUIDE-01", "heading": "How to use this guide"},
+        {"section_id": "GUIDE-02", "heading": "Unusual transfer to a new destination"},
+        {"section_id": "GUIDE-03", "heading": "Rapid activity involving one destination"},
+        {"section_id": "GUIDE-04", "heading": "Amount outside recent behaviour"},
+        {"section_id": "GUIDE-05", "heading": "High model risk with conflicting evidence"},
+        {"section_id": "GUIDE-06", "heading": "Case-note checklist"}
+      ]
+    },
+    {
+      "source_id": "risk-alert-interpretation-guide-v1",
+      "title": "Risk and Alert Interpretation Guide",
+      "path": "guides/risk-and-alert-interpretation.md",
+      "document_type": "guide",
+      "version": "1.0.0",
+      "domains": ["risk_interpretation"],
+      "sections": [
+        {"section_id": "RISK-01", "heading": "Purpose and boundaries"},
+        {"section_id": "RISK-02", "heading": "What the fraud score means"},
+        {"section_id": "RISK-03", "heading": "Precision recall and investigation workload"},
+        {"section_id": "RISK-04", "heading": "Interpreting behavioural features"},
+        {"section_id": "RISK-05", "heading": "Human review and decision limits"},
+        {"section_id": "RISK-06", "heading": "PaySim and model limitations"}
+      ]
+    }
+  ],
+  "supported_scenarios": [
+    {
+      "scenario_id": "SCN-NEW-DESTINATION",
+      "source_id": "analyst-investigation-guide-v1",
+      "section_id": "GUIDE-02",
+      "responsible_role": "Fraud Operations Analyst"
+    },
+    {
+      "scenario_id": "SCN-DESTINATION-BURST",
+      "source_id": "analyst-investigation-guide-v1",
+      "section_id": "GUIDE-03",
+      "responsible_role": "Fraud Operations Analyst"
+    },
+    {
+      "scenario_id": "SCN-AMOUNT-DEVIATION",
+      "source_id": "analyst-investigation-guide-v1",
+      "section_id": "GUIDE-04",
+      "responsible_role": "Fraud Operations Analyst"
+    },
+    {
+      "scenario_id": "SCN-CONFLICTING-EVIDENCE",
+      "source_id": "analyst-investigation-guide-v1",
+      "section_id": "GUIDE-05",
+      "responsible_role": "Senior Fraud Reviewer"
+    }
+  ]
+}
