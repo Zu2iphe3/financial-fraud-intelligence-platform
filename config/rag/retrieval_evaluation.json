@@ -1,0 +1,26 @@
+{
+  "purpose": "Small PH9-02 relevance check for the committed fictional corpus",
+  "covered_questions": [
+    {
+      "question": "What should an analyst investigate when a transfer goes to a new destination?",
+      "expected_section_ids": ["GUIDE-02"]
+    },
+    {
+      "question": "When should rapid activity involving one destination be escalated?",
+      "expected_section_ids": ["GUIDE-03", "ESC-03"]
+    },
+    {
+      "question": "What does the fraud probability mean and why is it not proof of fraud?",
+      "expected_section_ids": ["RISK-02", "RISK-05"]
+    },
+    {
+      "question": "What information should be included in a fraud escalation hand-off?",
+      "expected_section_ids": ["ESC-04", "ESC-05"]
+    }
+  ],
+  "unsupported_questions": [
+    "How should an employee request annual leave?",
+    "How do I replace a flat car tyre?",
+    "What recipe should I use to bake sourdough bread?"
+  ]
+}

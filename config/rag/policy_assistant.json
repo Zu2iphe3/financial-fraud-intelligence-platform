@@ -1,0 +1,15 @@
+{
+  "config_version": "1.0.0",
+  "corpus_path": "knowledge_base",
+  "manifest_path": "knowledge_base/manifest.json",
+  "vector_store_path": "chroma_db",
+  "collection_name": "ffip_fraud_policy_v1",
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "ollama_base_url": "http://localhost:11434",
+  "ollama_chat_model": "llama3.2:3b",
+  "chunk_size": 900,
+  "chunk_overlap": 120,
+  "retrieval_top_k": 4,
+  "minimum_relevance_score": 0.35,
+  "insufficient_evidence_message": "The fictional knowledge base does not contain enough information to answer this question."
+}

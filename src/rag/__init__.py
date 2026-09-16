@@ -1,1 +1,1 @@
-"""Retrieval-augmented analyst-assistant components."""
+"""Local retrieval-augmented fictional fraud-policy assistant."""
