@@ -59,6 +59,15 @@ jobs:
           cache: pip
           cache-dependency-path: requirements.txt
 
+      # The RAG embedding library needs PyTorch, but CI does not use a GPU.
+      # Installing the CPU wheel first prevents pip from downloading the much
+      # larger CUDA dependency set and exhausting the hosted runner's disk.
+      - name: Install CPU-only PyTorch
+        run: >-
+          python -m pip install
+          --index-url https://download.pytorch.org/whl/cpu
+          "torch>=2.2,<3.0"
+
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
 
