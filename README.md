@@ -72,6 +72,7 @@ Phase 8 prediction serving:
 Phase 9 RAG analyst assistant:
 
 - [Fictional fraud-policy knowledge base](docs/FRAUD_POLICY_KNOWLEDGE_BASE.md)
+- [Local grounded RAG analyst assistant](docs/RAG_ASSISTANT.md)
 
 ## Technology stack
 
