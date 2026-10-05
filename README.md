@@ -74,6 +74,10 @@ Phase 9 RAG analyst assistant:
 - [Fictional fraud-policy knowledge base](docs/FRAUD_POLICY_KNOWLEDGE_BASE.md)
 - [Local grounded RAG analyst assistant](docs/RAG_ASSISTANT.md)
 
+Phase 10 portfolio dashboard:
+
+- [Streamlit fraud intelligence dashboard](docs/STREAMLIT_DASHBOARD.md)
+
 ## Technology stack
 
 - Python, SQL, Git, and GitHub

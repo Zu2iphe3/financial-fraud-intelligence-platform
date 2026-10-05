@@ -11,9 +11,9 @@ useless for fraud detection.
 This phase is a controlled modelling study, not a deployed fraud decision system.
 Earlier v1 PH7-02 work evaluated the test partition. That v1 test information was not
 used to select or tune the behavioural v2 model. Final v2 feature selection and XGBoost
-tuning used train and validation data only. No v2 test evaluation has occurred.
-Therefore, the overall PH7-02 test partition is not globally untouched; only the v2
-modelling process remained test-isolated.
+tuning used train and validation data only. After the v2 model and threshold were
+frozen, one final held-out test evaluation was
+performed without changing the selected model, features, tuning, or threshold.
 
 ## V1: the honest minimal baseline
 
@@ -92,9 +92,9 @@ need for an operational threshold decision.
 - **Train, days 1-18:** fit scalers and model parameters.
 - **Validation, days 19-24:** compare models, stop XGBoost training, compare thresholds,
   and choose modelling direction.
-- **Test, days 25-31:** earlier v1 work evaluated this period only after locking its v1
-  model and validation threshold. Behavioural v2 has not evaluated it. Day 31 remains a
-  separately identified simulator-artifact cohort.
+- **Test, days 25-31:** evaluate the final frozen model once. Behavioural v2 test data
+  was opened only after its model, features, hyperparameters, and threshold were locked.
+  Day 31 remains a separately identified simulator-artifact cohort.
 
 Keeping these roles separate prevents us from repeatedly checking test results and
 quietly adapting the model to the test set.
@@ -216,7 +216,13 @@ describe how to reproduce it.
 | Tuned V2 XGBoost | 0.487886 | 0.344041 | 0.706464 | 0.462735 | 2,042 | 445 |
 
 These threshold-level values use maximum-F1 validation review points. They are not a
-production threshold decision, and the test partition has not been evaluated for v2.
+production threshold decision.
+
+The final frozen v2 model then achieved held-out test PR-AUC `0.539848`, ROC-AUC
+`0.957729`, precision `0.289325`, recall `0.752717`, and F1 `0.417987` at the unchanged
+`0.49207180738449097` threshold. It found 1,385 of 1,840 fraud cases, with 3,402 false
+positives and 455 false negatives. Test evidence was reported, not used to revise the
+model.
 
 ## Did v2 obviously overfit?
 
@@ -228,8 +234,9 @@ obvious train/validation overfitting signal.
 
 Training has a much lower fraud rate than validation, so raw PR-AUC, precision, and F1
 cannot be compared as though both partitions had the same class balance. The diagnostic
-supports reasonable train-to-validation generalization, but v2 test evaluation is still
-required later for independent final evidence.
+supports reasonable train-to-validation generalization. The later held-out result adds
+independent evidence: ranking and recall remained strong, while precision and F1 fell
+at the frozen threshold.
 
 ## How to explain this work in an interview
 
@@ -245,5 +252,6 @@ required later for independent final evidence.
 > 21% to 69%. I tracked controlled class-weight and hyperparameter experiments in MLflow,
 > rejected constant relationship features and an Isolation Forest score when operational
 > top-k results did not improve. Earlier v1 work had evaluated test after locking its
-> choice, but I kept behavioural v2 test-isolated throughout feature selection and
-> tuning; v2 has not been evaluated on test.
+> choice, and I kept behavioural v2 test-isolated throughout feature selection and
+> tuning. After freezing the v2 model and threshold, I evaluated them once on future
+> days 25-31 and reported the mixed generalisation result without changing the model.

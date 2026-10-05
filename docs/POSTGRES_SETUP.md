@@ -54,6 +54,15 @@ Get-Content database/init/001_create_raw_transactions.sql | docker compose exec 
 
 Reapplying the script is safe: existing records remain and schema objects are not duplicated.
 
+Point-in-time model scoring also uses an idempotent destination-history index. Empty
+volumes create it automatically. For a database volume initialized before that index
+was added, apply it once using the container's existing database configuration:
+
+```powershell
+Get-Content -Raw database/init/003_create_point_in_time_feature_index.sql |
+  docker compose exec -T postgres sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"'
+```
+
 ## PaySim field mapping
 
 The `raw.transactions` table preserves all 11 PaySim source fields. Platform-generated values have separate, clearly named columns.

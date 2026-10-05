@@ -9,9 +9,10 @@ the Day 31 indicator, or future activity as predictive inputs.
 
 This is validation-stage evidence. Earlier v1 PH7-02 work evaluated the test partition.
 That v1 test information was not used to select or tune the behavioural v2 model. Final
-v2 feature selection and XGBoost tuning used train and validation data only. No v2 test
-evaluation has occurred. Therefore, the overall PH7-02 test partition is not globally
-untouched; only the v2 modelling process remained test-isolated.
+v2 feature selection and XGBoost tuning used train and validation data only. After the
+model, feature contract, and `0.49207180738449097` threshold were frozen, they were
+evaluated once on the v2 chronological test partition. The test result did not change
+the selected model, features, hyperparameters, or threshold.
 
 ## Historical boundary
 
@@ -82,10 +83,9 @@ maximum-F1 threshold is automatically the right operational choice.
 
 ## Train and validation diagnostics
 
-The stored tuned v2 model was evaluated diagnostically on train and validation using
+Before opening test data, the stored tuned v2 model was evaluated diagnostically on train and validation using
 the same unchanged validation maximum-F1 review threshold (`0.492072`). This threshold
-remains a comparison point, not a production policy. No retraining or test evaluation
-was performed.
+remains a comparison point, not a production policy. No retraining was performed.
 
 | Partition | Fraud rate | PR-AUC | ROC-AUC | Precision | Recall | F1 |
 |---|---:|---:|---:|---:|---:|---:|
@@ -101,6 +101,31 @@ Validation recall by day was `71.88%`, `71.19%`, `72.43%`, `69.53%`, `68.06%`, a
 `70.36%` for days 19 through 24 respectively. The approximately 68–72% range shows that
 overall validation recall is not dominated by one day. Daily precision and PR-AUC vary
 more because the daily fraud rate changes substantially.
+
+## Final frozen-model held-out evaluation
+
+The persisted `paysim_fraud_model_v2_tuned_review` artifact and its unchanged
+`0.49207180738449097` threshold were evaluated once on steps 577-743 (days 25-31).
+Before the test partition was loaded, the evaluator verified the promoted run ID,
+feature-contract digest, validation-selected threshold, and the original search and
+visual manifests recording `test_partition_loaded=false`.
+
+PR-AUC and ROC-AUC are threshold-independent ranking measures. Precision, recall, F1,
+accuracy, alerts, and confusion-matrix counts below use the frozen threshold.
+
+| Test cohort | Rows | Fraud | Fraud rate | PR-AUC | ROC-AUC | Precision | Recall | F1 | TP | FP | FN | TN |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Full held-out test, days 25-31 | 161,426 | 1,840 | 1.1398% | 0.539848 | 0.957729 | 0.289325 | 0.752717 | 0.417987 | 1,385 | 3,402 | 455 | 156,184 |
+| Standard period, days 25-30 | 161,154 | 1,568 | 0.9730% | 0.519707 | 0.959165 | 0.258339 | 0.755740 | 0.385053 | 1,185 | 3,402 | 383 | 156,184 |
+| Day 31 simulator artifact | 272 | 272 | 100% | Not informative | Undefined | 1.000000 | 0.735294 | 0.847458 | 200 | 0 | 72 | 0 |
+
+Compared with validation, full-test PR-AUC increased from `0.487886` to `0.539848`,
+ROC-AUC decreased slightly from `0.962215` to `0.957729`, and recall increased from
+`70.65%` to `75.27%`. Precision fell from `34.40%` to `28.93%` and F1 from `0.462735`
+to `0.417987` because the unchanged threshold generated more false-positive alerts in
+the later period. This is mixed generalisation evidence rather than uniform degradation:
+ranking and recall remained strong, while threshold-level precision and F1 weakened.
+No model or threshold change was made after observing test results.
 
 ### Tuned XGBoost recall targets
 
