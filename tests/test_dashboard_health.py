@@ -75,8 +75,12 @@ def test_prediction_health_reports_ready_and_unavailable_independently() -> None
     assert "private" not in unavailable.message
 
 
-def test_policy_search_health_runs_a_real_semantic_readiness_query(monkeypatch) -> None:
-    settings = load_rag_settings(environ={})
+def test_policy_search_health_runs_a_real_semantic_readiness_query(
+    monkeypatch, tmp_path
+) -> None:
+    index_path = tmp_path / "policy-index"
+    index_path.mkdir()
+    settings = load_rag_settings(environ={"RAG_CHROMA_PATH": str(index_path)})
     monkeypatch.setattr(health, "load_rag_settings", lambda: settings)
 
     class ReadyService:
@@ -90,8 +94,12 @@ def test_policy_search_health_runs_a_real_semantic_readiness_query(monkeypatch) 
     assert result.message == "Semantic retrieval ready · 4 evidence matches"
 
 
-def test_policy_search_health_reports_embedding_initialization_failure(monkeypatch) -> None:
-    settings = load_rag_settings(environ={})
+def test_policy_search_health_reports_embedding_initialization_failure(
+    monkeypatch, tmp_path
+) -> None:
+    index_path = tmp_path / "policy-index"
+    index_path.mkdir()
+    settings = load_rag_settings(environ={"RAG_CHROMA_PATH": str(index_path)})
     monkeypatch.setattr(health, "load_rag_settings", lambda: settings)
 
     result = health.check_policy_search(
