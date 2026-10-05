@@ -15,9 +15,9 @@ the financial cost of false positives versus missed fraud has not been specified
 
 Earlier v1 PH7-02 work evaluated the test partition. That v1 test information was not
 used to select or tune the behavioural v2 model. Final v2 feature selection and XGBoost
-tuning used train and validation data only. No v2 test evaluation has occurred.
-Therefore, the overall PH7-02 test partition is not globally untouched; only the v2
-modelling process remained test-isolated.
+tuning used train and validation data only. After promotion, the frozen v2 artifact and
+unchanged validation threshold were evaluated once on the chronological test partition.
+Those results were not used to revise the model, features, tuning, or threshold.
 
 ## Protected inputs and chronological data
 
@@ -104,6 +104,23 @@ fraud, recall, and false negatives are useful for that artifact cohort. The stan
 period is the primary generalization view.
 
 ![Selected-model test cohorts](figures/08_test_cohort_evaluation.png)
+
+## Frozen behavioural-v2 held-out evaluation
+
+The later behavioural-v2 model was selected and tuned using train days 1-18 and
+validation days 19-24 only. After promotion, the exact persisted
+`paysim_fraud_model_v2_tuned_review` artifact and frozen `0.49207180738449097`
+threshold were evaluated once on test days 25-31.
+
+| Population | Rows | Fraud | PR-AUC | ROC-AUC | Precision | Recall | F1 | FP | FN |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Validation/model selection | 192,778 | 1,516 | 0.487886 | 0.962215 | 0.344041 | 0.706464 | 0.462735 | 2,042 | 445 |
+| Held-out test | 161,426 | 1,840 | 0.539848 | 0.957729 | 0.289325 | 0.752717 | 0.417987 | 3,402 | 455 |
+
+PR-AUC and ROC-AUC are threshold-independent. Precision, recall, F1, false positives,
+and false negatives use the frozen threshold. The test evidence did not trigger any
+model or threshold change. Detailed standard-period and Day 31 cohort results are in
+[`MODELLING_DATASET_V2.md`](MODELLING_DATASET_V2.md).
 
 ## MLflow and persisted artifact
 

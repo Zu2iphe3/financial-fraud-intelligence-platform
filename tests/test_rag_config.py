@@ -15,7 +15,7 @@ def test_load_rag_settings_uses_repository_defaults() -> None:
     assert settings.corpus_path.name == "knowledge_base"
     assert settings.manifest_path == settings.corpus_path / "manifest.json"
     assert settings.vector_store_path.name == "chroma_db"
-    assert settings.minimum_relevance_score == 0.35
+    assert settings.minimum_relevance_score == 0.40
 
 
 def test_load_rag_settings_accepts_local_environment_overrides(tmp_path) -> None:

@@ -4,7 +4,9 @@ This record preserves useful experiments without placing rejected features in th
 normal v2 generation or modelling path. It contains behavioural v2 validation evidence
 only: the v2 experiment did not load the test partition and selected no production
 threshold. Earlier v1 PH7-02 work did evaluate the test partition, as documented in
-`MODEL_TRAINING.md`.
+`MODEL_TRAINING.md`. A later, separate final evaluation opened the v2 test partition
+only after the selected artifact and validation threshold were frozen; it did not alter
+the non-selected experiment evidence preserved here.
 
 ## Selected path
 

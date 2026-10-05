@@ -50,7 +50,7 @@ Committed defaults live in `config/rag/policy_assistant.json`:
 | Collection | `ffip_fraud_policy_v1` | Separates this corpus from other indexes. |
 | Chunk size / overlap | 900 / 120 characters | Splits longer sections while retaining nearby context. |
 | Retrieval top-k | 4 | Limits the context and review surface. |
-| Minimum relevance | 0.35 | Rejects evidence below the reviewed boundary. |
+| Minimum relevance | 0.40 | Rejects evidence below the reviewed boundary. |
 
 Local overrides supported through `.env` or the current shell are:
 
@@ -92,20 +92,29 @@ ollama list
 Ollama normally starts its local service with the Windows application. If it is
 not running, start Ollama before using the `ask` command.
 
-Hugging Face downloads the embedding model the first time indexing runs. A
-checkout inside a long OneDrive path may exceed Windows path limits in the
-default cache. Use a shorter local cache in that case:
+Hugging Face downloads the embedding model the first time indexing runs. Its
+normal user cache (`$env:USERPROFILE\.cache\huggingface`) is already outside the
+repository and avoids the long OneDrive checkout path. Do not point `HF_HOME` at
+`$env:TEMP`: Windows can clear that directory and leave offline retrieval without
+the required model files.
+
+If a different durable short cache is needed, select it before the first online
+download and keep using the same value:
 
 ```powershell
 $env:HF_HOME="$env:LOCALAPPDATA\ffip-hf"
 $env:HF_HUB_DISABLE_TELEMETRY="1"
 ```
 
-After the model has downloaded, fully local/offline validation can use:
+Run the index command once while online so that chosen cache is populated. Only
+after the model has downloaded can fully local/offline validation use:
 
 ```powershell
 $env:HF_HUB_OFFLINE="1"
 ```
+
+`HF_HUB_OFFLINE=1` never downloads missing files. If `HF_HOME` changes or its
+contents are removed, unset offline mode and populate the selected cache again.
 
 No Hugging Face token is required for this public embedding model.
 
@@ -144,7 +153,7 @@ python -m src.rag.cli retrieve "When should rapid destination activity be escala
 
 The intentionally small evaluation set is committed at
 `config/rag/retrieval_evaluation.json`. It contains four covered questions and
-three clearly unrelated questions. Run it with:
+four clearly unsupported questions. Run it with:
 
 ```powershell
 python -m src.rag.cli evaluate
@@ -152,7 +161,7 @@ python -m src.rag.cli evaluate
 
 Results for the reviewed embedding model and corpus were:
 
-| Question category | Raw top relevance score | Result at 0.35 |
+| Question category | Raw top relevance score | Result at 0.40 |
 |---|---:|---|
 | New-destination investigation | 0.5563 | Expected section found |
 | Rapid-destination escalation | 0.4648 | Expected section found |
@@ -161,10 +170,13 @@ Results for the reviewed embedding model and corpus were:
 | Employee annual leave | 0.1955 | Rejected |
 | Replacing a flat tyre | 0.0372 | Rejected |
 | Sourdough recipe | 0.0741 | Rejected |
+| PostgreSQL transaction count | 0.3657 | Rejected |
 
-All 4 covered questions found an expected source and all 3 unsupported questions
-were rejected. The 0.35 boundary sits between the lowest covered top score
-(0.4648) and highest unsupported top score (0.1955).
+All 4 covered questions found an expected source and all 4 unsupported questions
+were rejected. The 0.40 boundary sits between the lowest covered top score
+(0.4648) and highest unsupported top score (0.3657). The boundary was tightened
+after browser validation found that a database-count question marginally crossed
+the earlier threshold despite being outside the policy corpus.
 
 This is a transparent acceptance check, not a broad retrieval benchmark. The
 threshold must be reviewed again if the corpus, embedding model, or chunking

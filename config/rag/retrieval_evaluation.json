@@ -21,6 +21,7 @@
   "unsupported_questions": [
     "How should an employee request annual leave?",
     "How do I replace a flat car tyre?",
-    "What recipe should I use to bake sourdough bread?"
+    "What recipe should I use to bake sourdough bread?",
+    "How many transactions are there in PostgreSQL?"
   ]
 }

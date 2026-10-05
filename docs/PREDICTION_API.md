@@ -69,6 +69,11 @@ The deployable artifact records the current contract hash and is written under
 `artifacts/models/paysim_fraud_model_v2_scoring/`. Promotion refuses to replace an
 existing artifact silently.
 
+After promotion froze the artifact and threshold, the exact scoring bundle was evaluated
+once on chronological test days 25-31. This later evaluation did not change promotion,
+the model, the feature contract, or either risk boundary. See
+[`MODELLING_DATASET_V2.md`](MODELLING_DATASET_V2.md) for the held-out evidence.
+
 The model binary, MLflow database, and generated model state remain outside Git.
 The API image pins model-runtime packages to the versions recorded by this artifact,
 so a fresh container cannot silently use a different XGBoost or scikit-learn version.
@@ -162,7 +167,29 @@ python -m pytest --basetemp=.pytest_tmp/pytest
 
 ## Future integration
 
-The future Streamlit dashboard must call this API rather than importing the estimator.
-A future online feature-preparation service may compute the 20 values and call the same
-endpoint. Authentication, prediction persistence, live feature-state management,
-Streamlit, RAG, and cloud deployment are intentionally outside PH8-01.
+The Streamlit dashboard calls this API rather than importing the estimator. The local
+point-in-time adapter below prepares stored historical transactions; extracting it into
+a continuously updated online feature service remains future work. Authentication,
+prediction persistence, live feature-state management, and cloud deployment remain
+outside the current scoring workflow.
+
+## Point-in-time historical transaction scoring
+
+`src.features.point_in_time.PointInTimeFeatureService` reconstructs the reviewed v2
+vector for an existing PostgreSQL `transaction_id`. It selects only transaction
+identity, PaySim step, type, amount, and origin/destination identifiers; history is
+restricted to the same dataset and destination at strictly earlier steps. The service
+then reuses `calculate_destination_history()` and `transform_features()` rather than
+maintaining a second inference-only feature definition.
+
+`src.dashboard.transaction_scoring.HistoricalTransactionScoringService` joins that
+feature preparation to the existing `PredictionClient` and `/v1/predictions` endpoint.
+The Fraud Risk Scoring page uses this service to analyse stored transaction IDs without
+asking an investigator to prepare model features. Missing transactions, database
+failures, or invalid history fail explicitly and never substitute demonstration or
+zero-filled data.
+
+The PostgreSQL initialization scripts include a composite dataset/destination/step
+index for interactive history lookup. Existing persistent database volumes must apply
+`database/init/003_create_point_in_time_feature_index.sql` once; new empty volumes run
+it automatically with the other initialization scripts.
