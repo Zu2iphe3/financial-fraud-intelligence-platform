@@ -241,3 +241,5 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+# Obsolete local feature-entry fixture replaced by point-in-time transaction scoring.
+config/dashboard/example_model_input.json

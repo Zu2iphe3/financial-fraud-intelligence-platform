@@ -1,0 +1,18 @@
+[theme]
+primaryColor = "#1F6E68"
+backgroundColor = "#F7F9FA"
+secondaryBackgroundColor = "#EAF0F1"
+textColor = "#17242B"
+font = "sans-serif"
+
+[server]
+headless = true
+# PyTorch exposes dynamic modules that Streamlit's source watcher cannot safely
+# traverse. Disabling hot reload prevents noisy watcher errors and mixed old/new
+# dashboard imports; restart Streamlit after source changes instead.
+fileWatcherType = "none"
+
+[client]
+# The application provides its own stable page links. Hiding Streamlit's legacy
+# filesystem navigation prevents raw Python filenames appearing before app.py runs.
+showSidebarNavigation = false

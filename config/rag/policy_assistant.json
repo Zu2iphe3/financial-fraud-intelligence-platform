@@ -10,6 +10,6 @@
   "chunk_size": 900,
   "chunk_overlap": 120,
   "retrieval_top_k": 4,
-  "minimum_relevance_score": 0.35,
+  "minimum_relevance_score": 0.40,
   "insufficient_evidence_message": "The fictional knowledge base does not contain enough information to answer this question."
 }
