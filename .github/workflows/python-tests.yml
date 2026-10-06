@@ -16,6 +16,9 @@ jobs:
   secret-scan:
     name: Secret scan (Gitleaks)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
       # Full history lets Gitleaks detect a credential that was committed and
       # later removed, rather than checking only the latest file snapshot.
