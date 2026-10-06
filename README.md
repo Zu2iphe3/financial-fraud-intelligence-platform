@@ -90,7 +90,7 @@ Phase 10 portfolio dashboard:
 - Streamlit
 - pytest, dbt tests, and GitHub Actions
 
-## Automated Python tests
+## Automated platform validation
 
 On Windows, keep pytest's temporary fixture directories inside the repository to avoid permission problems with the system temporary directory:
 
@@ -100,9 +100,17 @@ python -m pytest --basetemp=.pytest_tmp/pytest
 
 The `.pytest_tmp/` directory is ignored by Git. This changes only where pytest stores temporary test files; it does not change which tests run or application behavior.
 
-Pull requests targeting `main` and pushes to `main` automatically run the complete pytest suite through GitHub Actions. This checks proposed changes before merge and verifies the resulting `main` branch after a merge or direct push. The workflow creates a clean Ubuntu environment with Python 3.12, temporary PostgreSQL and Apache Kafka services, restores cached pip downloads where available, installs the dependencies declared in `requirements.txt`, initializes the database schemas and Kafka topic, and runs `python -m pytest`.
+Pull requests targeting `main` and pushes to `main` automatically run the final platform checks through GitHub Actions. This validates proposed changes before merge and verifies the resulting `main` branch after a merge or direct push. The workflow:
 
-The result appears in the pull request checks as `pytest (Python 3.12)`. A passing suite produces a green check; a failed test produces a failed check whose workflow log identifies the failing test. This initial workflow performs testing only and does not deploy the project.
+- validates the complete Docker Compose configuration, including the optional API and Airflow profiles, without building or starting those heavyweight services;
+- restores cached pip downloads where available and installs `requirements.txt` in a clean Python 3.12 environment;
+- checks the dbt connection and compiles every model, test, source reference, macro and YAML definition without processing the full PaySim dataset;
+- starts temporary PostgreSQL and Apache Kafka services, initializes their schemas/topic and runs the complete pytest collection, including enabled database, Kafka and FastAPI integration tests; and
+- scans the complete Git history with Gitleaks, failing on recognized credential patterns while keeping secret values out of comments and uploaded report artifacts.
+
+The pull request displays `Platform tests (Python 3.12)` and `Secret scan (Gitleaks)` checks. Clearly named workflow steps and normal pytest/dbt diagnostics identify the failed test, dbt resource, service configuration or secret location. These checks validate the repository but never deploy it.
+
+GitHub-hosted CI intentionally does not ingest the 6.3-million-row PaySim CSV, execute a full data-populated `dbt build`, retrain models, start Airflow or the Streamlit dashboard, download local model artifacts, or run Ollama and its embedding models. Those data-heavy and local-service workflows remain covered by their documented local validation procedures. FastAPI contracts and model-service behaviour, RAG grounding behaviour and dashboard behaviour still run through the automated Python suite using repository fixtures and mocks where a live local dependency would be disproportionate.
 
 ## Build phases
 
