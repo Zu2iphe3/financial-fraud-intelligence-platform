@@ -1,130 +1,244 @@
 # Financial Fraud Intelligence Platform
 
-An end-to-end data and AI portfolio platform for simulated real-time financial transaction processing, fraud detection, analytics, MLOps, and a retrieval-augmented fraud analyst assistant.
+[![Platform validation](https://github.com/Zu2iphe3/financial-fraud-intelligence-platform/actions/workflows/python-tests.yml/badge.svg)](https://github.com/Zu2iphe3/financial-fraud-intelligence-platform/actions/workflows/python-tests.yml)
 
-## Business problem
+An end-to-end data and AI portfolio platform that processes **6,362,620 synthetic
+PaySim mobile-money transactions**, builds trusted fraud analytics, evaluates a
+leakage-safe XGBoost model, serves reproducible risk scores, and answers questions from
+a fictional fraud-policy knowledge base.
 
-A fictional digital-payments company needs to ingest transaction events reliably, create trusted analytical data, identify suspicious transactions, expose fraud-risk predictions, and help analysts retrieve guidance from fraud-policy documents.
+The project demonstrates how data engineering, analytics engineering, machine learning,
+model serving, local retrieval-augmented generation, orchestration, and an analyst-facing
+application can work together without presenting a portfolio system as a production
+fraud decision engine.
 
-This repository uses public or synthetic data, original code, and fictional policy documents only.
+## What the platform does
 
-## Planned architecture
+- Loads PaySim into PostgreSQL in validated, idempotent chunks.
+- Replays the same source rows through Kafka to demonstrate event delivery, consumer
+  validation, ingestion auditing, and duplicate-safe persistence on the
+  `paysim.transactions.v1` topic.
+- Uses dbt to create tested staging, intermediate, and analytics marts.
+- Uses Airflow to orchestrate PostgreSQL readiness, batch ingestion, reconciliation,
+  and the dbt build. Kafka intentionally remains outside this batch DAG.
+- Builds chronological, leakage-safe behavioural features using only activity strictly
+  before each transaction's PaySim hour.
+- Compares interpretable baselines with XGBoost and records experiment/model-selection
+  provenance in local MLflow.
+- Serves the final approved XGBoost bundle through FastAPI. Runtime inference does not
+  require the historical MLflow database.
+- Uses local sentence-transformer embeddings, Chroma retrieval, and Ollama to answer
+  only from the fictional policy corpus, with application-controlled source metadata.
+- Presents historical analytics, point-in-time transaction scoring, policy guidance,
+  and independent service health in a multi-page Streamlit dashboard.
+- Runs Python, PostgreSQL, Kafka, FastAPI, dbt, Compose, and secret-scanning checks in
+  GitHub Actions.
 
-```text
-PaySim -> Python producer -> Kafka -> Python consumer -> PostgreSQL
-                                                        |
-                                                        v
-                                                dbt transformations
-                                                   /           \
-                                                  v             v
-                                        analytics marts    ML features
-                                                  |             |
-                                                  v             v
-                                           Streamlit       XGBoost
-                                                              |
-                                                     MLflow -> FastAPI
+## Implemented architecture
 
-Fictional fraud documents -> chunks -> embeddings -> vector store
-                         -> retrieval -> Ollama -> analyst assistant
+```mermaid
+flowchart TB
+    subgraph DATA[1. Data Ingestion]
+        direction LR
+        PAYSIM["PaySim Dataset<br/>(6.36M Transactions)"]
+        BATCH[Batch Data Ingestion]
+        KAFKA[Kafka Replay Ingestion]
+        POSTGRES[(PostgreSQL)]
+        AIRFLOW[Airflow]
+
+        PAYSIM --> BATCH --> POSTGRES
+        PAYSIM --> KAFKA --> POSTGRES
+        AIRFLOW -. orchestrates batch .-> BATCH
+    end
+
+    subgraph INTELLIGENCE[2. Analytics & AI]
+        direction LR
+        DBT[dbt]
+        MARTS[(Analytics Marts)]
+        TRAINING["Model Training & Evaluation<br/>(XGBoost + MLflow)"]
+        MODEL[Selected Trained<br/>XGBoost Model]
+        API[FastAPI]
+        POLICIES[Fictional Policy Corpus]
+        RAG["Policy Retrieval & AI Assistant<br/>(Chroma + Ollama)"]
+
+        DBT --> MARTS
+        TRAINING --> MODEL --> API
+        POLICIES --> RAG
+    end
+
+    subgraph APPLICATION[3. Application]
+        DASHBOARD[Fraud Intelligence Dashboard<br/>Analytics · Fraud Scoring · Policy Assistant]
+    end
+
+    POSTGRES --> DBT
+    POSTGRES --> TRAINING
+    AIRFLOW -. orchestrates dbt .-> DBT
+    MARTS --> DASHBOARD
+    API --> DASHBOARD
+    RAG --> DASHBOARD
 ```
 
-## Dataset
+For transaction scoring, Streamlit retrieves the selected transaction and its historical
+activity from PostgreSQL, reconstructs leakage-safe point-in-time behavioural features,
+and sends the model-ready vector to FastAPI. FastAPI applies the already-trained XGBoost
+model and returns the probability and risk result for Streamlit to display. Model training
+and runtime inference are separate: the model is never retrained during prediction and
+remains portfolio decision support rather than a production-approved fraud system.
 
-The project uses the [PaySim synthetic financial dataset](https://www.kaggle.com/datasets/ealaxi/paysim1). PaySim simulates mobile-money transactions and includes labels identifying simulated fraud.
+[View the detailed implemented architecture and system boundaries](docs/ARCHITECTURE.md).
 
-The complete dataset is intentionally excluded from Git. After downloading it, place the CSV file under `data/raw/`. A small permitted sample may be added to `data/sample/` later for tests and demonstrations.
+Important boundaries:
 
-Phase 2 documentation:
+- Kafka is a controlled ingestion/replay path; it is **not** the live model-inference
+  path.
+- Airflow orchestrates the historical batch and dbt pipeline; it does not orchestrate
+  Kafka, model training, RAG, or application serving.
+- MLflow records experimentation and selection evidence; FastAPI loads the separately
+  versioned approved model bundle at runtime.
+- Streamlit reconstructs model-ready features for a selected historical transaction
+  through the reviewed point-in-time service. There is no deployed online feature store.
 
-- [PaySim data dictionary](docs/DATA_DICTIONARY.md)
-- [Exploratory analysis findings](docs/EDA_FINDINGS.md)
-- [Reproducible exploration notebook](notebooks/01_paysim_exploration.ipynb)
+## Machine-learning methodology and results
 
-Phase 3 local database setup:
+The whole-day chronological split prevents a model from learning from future simulated
+activity:
 
-- [PostgreSQL setup and transaction schema](docs/POSTGRES_SETUP.md)
-- [PaySim batch ingestion and reconciliation](docs/PAYSIM_INGESTION.md)
+| Partition | PaySim days | Rows | Fraud rows |
+|---|---:|---:|---:|
+| Train | 1–18 | 6,008,416 | 4,857 |
+| Validation | 19–24 | 192,778 | 1,516 |
+| Held-out test | 25–31 | 161,426 | 1,840 |
 
-Phase 4 local streaming setup:
+PaySim balance fields, fraud labels, flagged-fraud labels, raw identifiers, the current
+step, and future activity are prohibited predictive inputs. The final 20-feature
+contract combines amount/type with strictly earlier destination behaviour. Behavioural
+features improved validation PR-AUC from **0.296950** for the original feature-limited
+XGBoost model to **0.487886** for the tuned v2 model.
 
-- [Kafka transaction replay pipeline](docs/KAFKA_STREAMING.md)
+The final model and threshold were frozen using validation data before one held-out
+test evaluation:
 
-Phase 5 analytics engineering:
+| Held-out population | PR-AUC | ROC-AUC | Precision | Recall | F1 |
+|---|---:|---:|---:|---:|---:|
+| Days 25–31, 161,426 rows | **0.539848** | **0.957729** | **0.289325** | **0.752717** | **0.417987** |
 
-- [dbt fraud analytics layer](docs/DBT_ANALYTICS.md)
+PR-AUC and ROC-AUC describe ranking; precision, recall and F1 use the frozen validation
+threshold `0.49207180738449097`. These synthetic-data results support portfolio review,
+not an approved real-world fraud policy. See [model training and evaluation](docs/MODEL_TRAINING.md)
+and [behavioural feature evidence](docs/MODELLING_DATASET_V2.md).
 
-Phase 6 batch orchestration:
+## Quick start
 
-- [Airflow batch pipeline runbook](docs/AIRFLOW_RUNBOOK.md)
+The authoritative Windows/PowerShell setup, validation, and safe-shutdown sequence is
+in [Portfolio setup and local runbook](docs/PORTFOLIO_SETUP.md).
 
-Phase 7 machine learning and experiment tracking:
+At a high level:
 
-- [Leakage-safe modelling dataset](docs/MODELLING_DATASET.md)
-- [Leakage-safe behavioural modelling dataset review](docs/MODELLING_DATASET_V2.md)
-- [Fraud model training, selection, and evaluation](docs/MODEL_TRAINING.md)
-- [ML fraud detection learning notes](docs/ML_FRAUD_DETECTION_LEARNING_NOTES.md)
-- [Non-selected PH7-02 experiment evidence](docs/experiments/PH7_02_EXPERIMENT_EVIDENCE.md)
+```powershell
+git clone https://github.com/Zu2iphe3/financial-fraud-intelligence-platform.git
+cd financial-fraud-intelligence-platform
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+Copy-Item .env.example .env
+```
 
-Phase 8 prediction serving:
+Download PaySim from its original Kaggle page, configure local-only values in `.env`,
+then follow the runbook for the database, analytics, streaming, API, RAG, and dashboard.
+The raw CSV, real `.env`, databases, MLflow state, Chroma index, and other generated
+service state must remain local.
 
-- [FastAPI fraud model scoring service](docs/PREDICTION_API.md)
+### Reproducibility boundaries
 
-Phase 9 RAG analyst assistant:
+| Component | Release status |
+|---|---|
+| Approved FastAPI scoring bundle | Versioned in this repository with a checked SHA-256; normal inference does not need local MLflow history. |
+| PaySim data and PostgreSQL/dbt state | Reproducible from the separately downloaded synthetic CSV; the CSV and generated database state are not distributed. |
+| Kafka replay | Verified on `paysim.transactions.v1`; demonstrates duplicate-safe ingestion into PostgreSQL and is not the live scoring path. |
+| Policy assistant | Rebuilt locally from the included fictional corpus; downloaded embeddings, Chroma state, and the Ollama model remain local. |
+| MLflow experiment history | Local development evidence only and intentionally not distributed; the selected scoring bundle and reviewed metrics are documented independently. |
+| Airflow orchestration | Reproducible through Compose for the batch ingestion/reconciliation/dbt workflow; not required by FastAPI inference. |
 
-- [Fictional fraud-policy knowledge base](docs/FRAUD_POLICY_KNOWLEDGE_BASE.md)
-- [Local grounded RAG analyst assistant](docs/RAG_ASSISTANT.md)
+## Portfolio screenshots
 
-Phase 10 portfolio dashboard:
+These are genuine local runs against the implemented platform. They show synthetic
+PaySim activity, fictional policy guidance, and portfolio model evidence—not a live
+financial institution or production fraud system.
 
-- [Streamlit fraud intelligence dashboard](docs/STREAMLIT_DASHBOARD.md)
+### Analyst experience
 
-## Technology stack
+![Overview and Analytics with PaySim KPIs and daily patterns](docs/screenshots/01-overview-analytics.png)
 
-- Python, SQL, Git, and GitHub
-- Docker and Docker Compose
-- Apache Kafka and PostgreSQL
-- dbt Core and Apache Airflow
-- pandas, scikit-learn, XGBoost, and MLflow
-- FastAPI
-- LangChain, local embeddings, a local vector store, and Ollama
-- Streamlit
-- pytest, dbt tests, and GitHub Actions
+| Historical transaction scoring | Grounded policy guidance |
+|---|---|
+| [![A real stored transaction scored with point-in-time history](docs/screenshots/02-transaction-risk-scoring.png)](docs/screenshots/02-transaction-risk-scoring.png) | [![A grounded answer from the fictional policy corpus](docs/screenshots/03-policy-assistant-grounded-answer.png)](docs/screenshots/03-policy-assistant-grounded-answer.png) |
+
+The Policy Assistant presents application-controlled retrieval metadata separately from
+the generated answer. [View the verified fictional-policy source cards](docs/screenshots/12-policy-assistant-sources.png).
+
+### Engineering evidence
+
+| Successful batch orchestration | Local experiment comparison |
+|---|---|
+| [![Successful four-task Airflow DAG](docs/screenshots/04-airflow-successful-dag.png)](docs/screenshots/04-airflow-successful-dag.png) | [![XGBoost candidates compared in local MLflow](docs/screenshots/05-mlflow-model-comparison.png)](docs/screenshots/05-mlflow-model-comparison.png) |
+
+[View the complete screenshot evidence gallery](docs/screenshots/README.md), including
+transaction-type analytics, aggregate tables, feature reconstruction, validation versus
+held-out test evidence, verified RAG sources, and the privacy-cropped selected MLflow run.
+
+## Documentation
+
+| Area | Primary documentation |
+|---|---|
+| Release setup | [Portfolio setup and local runbook](docs/PORTFOLIO_SETUP.md) |
+| Data provenance and EDA | [Data dictionary](docs/DATA_DICTIONARY.md), [EDA findings](docs/EDA_FINDINGS.md), [notebook](notebooks/01_paysim_exploration.ipynb) |
+| PostgreSQL and ingestion | [PostgreSQL setup](docs/POSTGRES_SETUP.md), [PaySim ingestion](docs/PAYSIM_INGESTION.md) |
+| Streaming | [Kafka replay pipeline](docs/KAFKA_STREAMING.md) |
+| Analytics and orchestration | [dbt analytics](docs/DBT_ANALYTICS.md), [Airflow runbook](docs/AIRFLOW_RUNBOOK.md) |
+| ML methodology | [Dataset contract](docs/MODELLING_DATASET_V2.md), [model training](docs/MODEL_TRAINING.md), [learning notes](docs/ML_FRAUD_DETECTION_LEARNING_NOTES.md) |
+| Serving and application | [FastAPI scoring](docs/PREDICTION_API.md), [Streamlit dashboard](docs/STREAMLIT_DASHBOARD.md) |
+| RAG | [Knowledge base](docs/FRAUD_POLICY_KNOWLEDGE_BASE.md), [local RAG assistant](docs/RAG_ASSISTANT.md) |
+| Attribution | [Dataset and model attribution](docs/DATASET_AND_MODEL_ATTRIBUTION.md) |
 
 ## Automated platform validation
 
-On Windows, keep pytest's temporary fixture directories inside the repository to avoid permission problems with the system temporary directory:
+Pull requests targeting `main` and pushes to `main` run two visible checks:
+
+- **Platform tests (Python 3.12):** validates complete Compose configuration, installs
+  dependencies with caching, checks and compiles dbt, starts temporary PostgreSQL and
+  Kafka, and runs the complete pytest collection including enabled service integrations.
+- **Secret scan (Gitleaks):** scans complete Git history with read-only permissions and
+  safe reporting.
+
+Hosted CI intentionally does not ingest the full PaySim CSV, execute a data-populated
+dbt build, retrain models, start Airflow/Streamlit, or download Ollama and embedding
+models. Those resource-heavy paths are validated through the local release runbook.
+
+On Windows, keep pytest temporary files inside the repository:
 
 ```powershell
 python -m pytest --basetemp=.pytest_tmp/pytest
 ```
 
-The `.pytest_tmp/` directory is ignored by Git. This changes only where pytest stores temporary test files; it does not change which tests run or application behavior.
+## Limitations and responsible use
 
-Pull requests targeting `main` and pushes to `main` automatically run the final platform checks through GitHub Actions. This validates proposed changes before merge and verifies the resulting `main` branch after a merge or direct push. The workflow:
+- PaySim is synthetic and does not establish performance on real financial activity.
+- Fraud labels are historical evaluation truth; a model probability is not proof of
+  fraud and is presented only as decision support for human review.
+- Policy documents are original, fictional portfolio material and are not legal or
+  operational advice.
+- The platform has no production authentication, authorization, encrypted secret store,
+  continuously updated online feature service, monitoring/SLA, or deployment approval.
+- Local Ollama, embeddings, Chroma, PostgreSQL, Kafka, and Airflow require developer
+  machine resources and explicit setup.
 
-- validates the complete Docker Compose configuration, including the optional API and Airflow profiles, without building or starting those heavyweight services;
-- restores cached pip downloads where available and installs `requirements.txt` in a clean Python 3.12 environment;
-- checks the dbt connection and compiles every model, test, source reference, macro and YAML definition without processing the full PaySim dataset;
-- starts temporary PostgreSQL and Apache Kafka services, initializes their schemas/topic and runs the complete pytest collection, including enabled database, Kafka and FastAPI integration tests; and
-- scans the complete Git history with Gitleaks, failing on recognized credential patterns while keeping secret values out of comments and uploaded report artifacts.
+## Data, attribution, and license
 
-The pull request displays `Platform tests (Python 3.12)` and `Secret scan (Gitleaks)` checks. Clearly named workflow steps and normal pytest/dbt diagnostics identify the failed test, dbt resource, service configuration or secret location. These checks validate the repository but never deploy it.
+The raw PaySim CSV is not redistributed. Obtain it from the
+[original Kaggle PaySim1 listing](https://www.kaggle.com/datasets/ealaxi/paysim1).
+PaySim and the derived approved model are attributed separately in
+[Dataset and model attribution](docs/DATASET_AND_MODEL_ATTRIBUTION.md).
 
-GitHub-hosted CI intentionally does not ingest the 6.3-million-row PaySim CSV, execute a full data-populated `dbt build`, retrain models, start Airflow or the Streamlit dashboard, download local model artifacts, or run Ollama and its embedding models. Those data-heavy and local-service workflows remain covered by their documented local validation procedures. FastAPI contracts and model-service behaviour, RAG grounding behaviour and dashboard behaviour still run through the automated Python suite using repository fixtures and mocks where a live local dependency would be disproportionate.
-
-## Build phases
-
-1. Repository and development foundation
-2. Dataset acquisition and exploration
-3. Local PostgreSQL pipeline
-4. Simulated real-time streaming with Kafka
-5. Analytics engineering with dbt
-6. Workflow orchestration with Airflow
-7. Machine learning and experiment tracking
-8. Fraud prediction API
-9. RAG analyst assistant
-10. Dashboard, automated checks, and portfolio release
-
-## Current status
-
-Phase 9 - RAG analyst assistant (in progress).
+Original project source code and original documentation are licensed under the
+[MIT License](LICENSE). Third-party datasets, derived artifacts, libraries, and tools
+remain subject to their respective terms.

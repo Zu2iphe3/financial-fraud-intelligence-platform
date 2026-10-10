@@ -58,7 +58,9 @@ explicit for future feature, API, and model work.
    ```
 
 4. Apply the repeatable audit-table migration. This is required once for a PostgreSQL
-   volume created before Phase 4; fresh volumes run both initialization files automatically:
+   volume created before Phase 4; fresh volumes automatically run all three current
+   initialization scripts for transactions, ingestion auditing, and point-in-time
+   scoring:
 
    ```powershell
    docker compose exec postgres sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f /docker-entrypoint-initdb.d/002_create_transaction_ingestions.sql'

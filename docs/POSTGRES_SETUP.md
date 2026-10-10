@@ -44,19 +44,32 @@ The named volume `financial-fraud-platform-postgres-data` preserves database fil
 
 ## Initialize or reapply the schema
 
-On the first start of an empty volume, the official PostgreSQL image automatically runs `database/init/001_create_raw_transactions.sql`. The script uses safe `IF NOT EXISTS` statements and never drops, truncates, or deletes data.
+On the first start of an empty volume, the official PostgreSQL image automatically runs
+all three ordered scripts under `database/init/`:
 
-To reapply it to an existing database:
+1. `001_create_raw_transactions.sql` creates the transaction table;
+2. `002_create_transaction_ingestions.sql` creates Kafka delivery-audit storage; and
+3. `003_create_point_in_time_feature_index.sql` creates the destination-history index
+   used by interactive point-in-time scoring.
+
+The scripts use safe `IF NOT EXISTS` statements and never drop, truncate, or delete
+data.
+
+To safely reapply the complete schema to an existing database:
 
 ```powershell
-Get-Content database/init/001_create_raw_transactions.sql | docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U fraud_user -d fraud_platform
+Get-ChildItem database/init/*.sql | Sort-Object Name | ForEach-Object {
+  Get-Content -Raw $_.FullName |
+    docker compose exec -T postgres sh -c `
+      'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"'
+}
 ```
 
-Reapplying the script is safe: existing records remain and schema objects are not duplicated.
+Reapplying the scripts is safe: existing records remain and schema objects are not
+duplicated.
 
-Point-in-time model scoring also uses an idempotent destination-history index. Empty
-volumes create it automatically. For a database volume initialized before that index
-was added, apply it once using the container's existing database configuration:
+For a database volume initialized before the point-in-time index was added, it can also
+be applied independently:
 
 ```powershell
 Get-Content -Raw database/init/003_create_point_in_time_feature_index.sql |
