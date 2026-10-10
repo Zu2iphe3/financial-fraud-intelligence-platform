@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import hashlib
+import hmac
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Mapping
@@ -15,10 +18,20 @@ from sklearn.base import ClassifierMixin
 
 MODEL_FILENAME = "model.joblib"
 MANIFEST_FILENAME = "model_manifest.json"
+HASH_CHUNK_SIZE = 1024 * 1024
 
 
 class ScoringArtifactError(ValueError):
     """Raised when a model-ready artifact cannot honour its reviewed contract."""
+
+
+def calculate_file_sha256(path: str | Path) -> str:
+    """Hash an artifact incrementally so integrity checks stay memory efficient."""
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as file_handle:
+        for chunk in iter(lambda: file_handle.read(HASH_CHUNK_SIZE), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 @dataclass(frozen=True)
@@ -89,6 +102,8 @@ def save_scoring_bundle(bundle: ScoringModelBundle, output_directory: str | Path
         "package_versions": dict(bundle.package_versions),
         "input_boundary": "model_ready_features_prepared_upstream",
         "model_file": MODEL_FILENAME,
+        # Bind the readable model identity to the exact reviewed binary.
+        "model_sha256": calculate_file_sha256(model_path),
     }
     (destination / MANIFEST_FILENAME).write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
@@ -97,12 +112,34 @@ def save_scoring_bundle(bundle: ScoringModelBundle, output_directory: str | Path
 
 
 def load_scoring_bundle(output_directory: str | Path) -> ScoringModelBundle:
-    """Load an estimator and reject a missing, corrupt, or mismatched manifest."""
+    """Verify artifact integrity before loading and validating the estimator."""
     destination = Path(output_directory)
     try:
         manifest = json.loads((destination / MANIFEST_FILENAME).read_text(encoding="utf-8"))
-        bundle = joblib.load(destination / manifest["model_file"])
     except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError) as error:
+        raise ScoringArtifactError(f"Cannot load scoring artifact: {type(error).__name__}") from error
+
+    model_file = manifest.get("model_file")
+    expected_sha256 = manifest.get("model_sha256")
+    if model_file != MODEL_FILENAME:
+        raise ScoringArtifactError("Scoring manifest identifies an unexpected model file")
+    if not isinstance(expected_sha256, str) or re.fullmatch(
+        r"[0-9a-fA-F]{64}", expected_sha256
+    ) is None:
+        raise ScoringArtifactError("Scoring manifest has no valid model checksum")
+
+    model_path = destination / model_file
+    try:
+        observed_sha256 = calculate_file_sha256(model_path)
+    except OSError as error:
+        raise ScoringArtifactError(f"Cannot load scoring artifact: {type(error).__name__}") from error
+    if not hmac.compare_digest(observed_sha256, expected_sha256.lower()):
+        raise ScoringArtifactError("Scoring model checksum does not match the manifest")
+
+    try:
+        # Never deserialize model bytes until their reviewed checksum is confirmed.
+        bundle = joblib.load(model_path)
+    except (OSError, TypeError, ValueError) as error:
         raise ScoringArtifactError(f"Cannot load scoring artifact: {type(error).__name__}") from error
     if not isinstance(bundle, ScoringModelBundle):
         raise ScoringArtifactError("Persisted object is not a ScoringModelBundle")

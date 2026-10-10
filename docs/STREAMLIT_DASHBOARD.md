@@ -2,13 +2,13 @@
 
 ## Purpose and boundaries
 
-PH10-01 provides the portfolio interface for three completed platform capabilities:
+The dashboard provides a portfolio interface for three completed platform capabilities:
 
 | Dashboard experience | Authoritative backend | Meaning |
 |---|---|---|
 | Overview & Analytics | PostgreSQL `analytics_marts` dbt models | Historical simulated activity |
-| Fraud Risk Scoring | PH8 FastAPI service | Model-estimated fraud risk |
-| Policy Assistant | PH9 local Chroma retrieval and Ollama | Fictional policy guidance |
+| Fraud Risk Scoring | FastAPI scoring service | Model-estimated fraud risk |
+| Policy Assistant | Local Chroma retrieval and Ollama | Fictional policy guidance |
 
 These experiences are deliberately separate. Historical fraud labels are not a live
 prediction, a model probability is not proof of fraud, and fictional policy guidance
@@ -65,7 +65,13 @@ Install declared dependencies in the project virtual environment:
 
 ```powershell
 python -m pip install -r requirements.txt
+python -c "import streamlit; print(f'Streamlit {streamlit.__version__} is installed')"
 ```
+
+Run the import check in the same activated environment used to start Streamlit. If a
+deep Windows checkout causes a long-path installation failure, use the exact short-path
+fresh-environment procedure in the portfolio setup runbook rather than relying on an
+older machine-specific environment.
 
 ## Prepare historical analytics
 
@@ -88,12 +94,9 @@ read-only `SELECT` queries and do not alter source data.
 
 ## Prepare the prediction service
 
-If the reviewed scoring artifact does not exist locally, promote it using the PH8
-runbook. Promotion packages the reviewed model without retraining it:
-
-```powershell
-python -m src.models.promote_scoring_model
-```
+The approved scoring artifact is versioned with the repository, so normal dashboard
+setup does not require the historical local MLflow database or a promotion step. The
+API runbook documents its checksum and identity verification.
 
 Start FastAPI directly:
 
@@ -132,7 +135,7 @@ semantic readiness query against Chroma. It reports available only when the same
 retrieval path used by a user question succeeds. Keep `HF_HOME` on a durable path;
 do not use a temporary directory with `HF_HUB_OFFLINE=1`.
 
-Streamlit reuses the existing PH9 retrieval and answer-generation implementation. It
+Streamlit reuses the existing retrieval and answer-generation implementation. It
 does not duplicate chunking, relevance, grounding, refusal, prompt-injection, or source
 validation logic. The natural-language answer and application-controlled sources are
 rendered separately.
@@ -142,11 +145,18 @@ rendered separately.
 From the repository root:
 
 ```powershell
+$streamlitPort = if ([string]::IsNullOrWhiteSpace($env:STREAMLIT_PORT)) {
+  8501
+} else {
+  $env:STREAMLIT_PORT
+}
+
 python -m streamlit run src/dashboard/app.py `
-  --server.port $env:STREAMLIT_PORT
+  --server.port $streamlitPort
 ```
 
-Open <http://localhost:8501>. Use **Refresh connections** after starting or stopping
+If `STREAMLIT_PORT` is missing or empty, the command safely uses `8501`. Open
+<http://localhost:8501> (or the configured port). Use **Refresh connections** after starting or stopping
 a dependency; normal status results are cached briefly to keep widget interactions
 responsive.
 
@@ -184,7 +194,7 @@ normal page navigation and data refreshes do not require a restart.
 - Enter a supported investigation, escalation, or risk-interpretation question.
 - Review the grounded natural-language response.
 - Expand the fictional document and section sources supplied by retrieval metadata.
-- Unsupported questions return the PH9 insufficient-evidence response.
+- Unsupported questions return the existing insufficient-evidence response.
 
 ## Failure isolation
 
@@ -221,7 +231,7 @@ python -m pytest tests/integration/test_dashboard_integration.py `
   --basetemp=.pytest_tmp/ph10-dashboard-live
 ```
 
-The PH9 real embedding/Ollama integration suite remains the authoritative end-to-end
+The real embedding/Ollama integration suite remains the authoritative end-to-end
 validation for the reused RAG backend. Run the complete project regression suite with:
 
 ```powershell

@@ -1,4 +1,4 @@
-"""Shared small scoring fixtures that never depend on ignored local model state."""
+"""Shared small scoring fixtures independent of the versioned approved model."""
 
 from __future__ import annotations
 

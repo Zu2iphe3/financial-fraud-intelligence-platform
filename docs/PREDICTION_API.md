@@ -53,30 +53,38 @@ FRAUD_API_PORT=8000
 FRAUD_MODEL_ARTIFACT_HOST_PATH=./artifacts/models/paysim_fraud_model_v2_scoring
 ```
 
-## Promote the reviewed model
+## Approved scoring artifact
 
-The selected estimator is stored in ignored local MLflow evidence. Package it without
-retraining, tuning, loading the test partition, or selecting a new threshold:
+The repository includes the final approved scoring bundle at
+`artifacts/models/paysim_fraud_model_v2_scoring/`. A clean clone can therefore start
+the prediction service without the historical local MLflow database. The bundle contains
+only:
 
-```powershell
-python -m src.models.promote_scoring_model
-```
+- `model.joblib`, the frozen `paysim_fraud_model_v2_tuned_review` estimator; and
+- `model_manifest.json`, its model/run identity, ordered feature contract, package
+  versions, and model-binary SHA-256.
 
-The command verifies the approved MLflow run ID, its historical contract hash, the
-`high_child_weight` trial, and `test_partition_loaded=False`. It also proves that the 20
-feature names recorded with the estimator match the finalized committed v2 contract.
-The deployable artifact records the current contract hash and is written under
-`artifacts/models/paysim_fraud_model_v2_scoring/`. Promotion refuses to replace an
-existing artifact silently.
+At startup, the loader checks the model file against the manifest SHA-256 **before**
+joblib deserialization, then preserves the existing checks that the persisted model and
+readable manifest agree on model version, selected MLflow run, and feature contract.
+The API fails closed when any of these checks fail.
+
+MLflow remains the experimentation and model-selection provenance. Its local database,
+candidate runs, training outputs, alternative models, and review artifacts remain
+ignored. An original maintainer who retains the reviewed historical MLflow run can
+reproduce promotion with `python -m src.models.promote_scoring_model`; that historical
+state is not included in a clean clone. Promotion is not part of normal inference setup
+and deliberately refuses to overwrite the approved bundle silently.
 
 After promotion froze the artifact and threshold, the exact scoring bundle was evaluated
 once on chronological test days 25-31. This later evaluation did not change promotion,
 the model, the feature contract, or either risk boundary. See
 [`MODELLING_DATASET_V2.md`](MODELLING_DATASET_V2.md) for the held-out evidence.
 
-The model binary, MLflow database, and generated model state remain outside Git.
-The API image pins model-runtime packages to the versions recorded by this artifact,
-so a fresh container cannot silently use a different XGBoost or scikit-learn version.
+Only the approved model binary and its manifest are versioned. MLflow state and all
+other generated model state remain outside Git. The API image pins model-runtime
+packages to the versions recorded by this artifact, so a fresh container cannot
+silently use a different XGBoost or scikit-learn version.
 
 ## Run directly with Python
 
@@ -114,12 +122,12 @@ docker compose --profile api build fraud-api
 docker compose --profile api up --detach --wait fraud-api
 ```
 
-Compose mounts the ignored host artifact at `/opt/app/model` read-only. The model is
+Compose mounts the versioned host artifact at `/opt/app/model` read-only. The model is
 not copied into the Docker image. Use the same readiness and prediction commands shown
-above, then stop the service with:
+above, then stop only the API service while preserving other platform services with:
 
 ```powershell
-docker compose --profile api down
+docker compose stop fraud-api
 ```
 
 ## Endpoints and failures

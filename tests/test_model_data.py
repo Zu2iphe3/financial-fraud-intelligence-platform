@@ -12,6 +12,7 @@ from src.features.contract import load_feature_contract
 from src.models.config import load_model_config
 from src.models.data import (
     ModelDataError,
+    contract_sha256,
     load_partition,
     training_class_ratio,
     validate_dataset_manifest,
@@ -89,6 +90,17 @@ def test_default_model_config_protects_selection_policy():
         "threshold",
     )
     assert config.reference_recall_targets == (0.5, 0.75, 0.8, 0.9, 0.95)
+
+
+def test_contract_identity_is_stable_across_lf_and_crlf(tmp_path):
+    """Protect model identity from Git's platform-specific newline handling."""
+    lf_contract = tmp_path / "contract-lf.json"
+    crlf_contract = tmp_path / "contract-crlf.json"
+    content = b'{\n  "contract_version": "example"\n}\n'
+    lf_contract.write_bytes(content)
+    crlf_contract.write_bytes(content.replace(b"\n", b"\r\n"))
+
+    assert contract_sha256(lf_contract) == contract_sha256(crlf_contract)
 
 
 def test_manifest_reconciles_with_feature_contract():

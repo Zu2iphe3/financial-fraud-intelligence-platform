@@ -2,7 +2,7 @@
 
 ## Purpose and boundary
 
-PH9-02 makes the fictional PH9-01 fraud-policy corpus searchable and uses a
+The local RAG pipeline makes the fictional fraud-policy corpus searchable and uses a
 local Ollama model to explain retrieved guidance. It is a policy assistant, not
 a fraud prediction service. A policy answer must never be presented as a model
 score, and a model score must never be presented as policy evidence.
@@ -14,7 +14,7 @@ portfolio material rather than operational or legal guidance.
 ## How the pipeline works
 
 ```text
-PH9-01 manifest and Markdown documents
+Policy manifest and Markdown documents
     -> validate declared sources and sections
     -> split within section boundaries
     -> create local sentence-transformer embeddings
@@ -36,7 +36,7 @@ state lives under `chroma_db/`, which Git already ignores. PostgreSQL continues
 to serve transaction and analytics data; Chroma serves only local RAG evidence.
 
 pgvector remains a reasonable future option for a shared or larger deployment,
-but it is unnecessary for Issue #14.
+but it is unnecessary for this small local corpus.
 
 ## Configuration
 
@@ -238,8 +238,10 @@ The integration suite uses a temporary Chroma path. The normal `chroma_db/`
 index, downloaded embedding cache, Ollama models, `.env`, and test temporary
 directories must never be committed.
 
-## PH10 boundary
+## Dashboard integration
 
-The CLI is a transparent local testing interface. Streamlit will later call the
-same retrieval and assistant logic, but dashboard layout, sessions, analytics
-integration, and user-facing presentation remain in PH10-01.
+The CLI remains a transparent local testing interface. The implemented Streamlit
+Policy Assistant calls the same retrieval and assistant logic, renders the grounded
+answer separately from application-verified sources, and preserves insufficient-evidence
+and Ollama-failure outcomes. It does not add database question answering or duplicate
+the RAG pipeline inside the UI.

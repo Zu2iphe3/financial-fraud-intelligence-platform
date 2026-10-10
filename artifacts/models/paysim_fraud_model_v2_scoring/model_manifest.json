@@ -1,0 +1,39 @@
+{
+  "feature_contract_sha256": "6ed53e0caee1d2f4cb974090063f551a2b351d6dcbabc901a4e0f0d49014df8e",
+  "feature_contract_version": "paysim_features_v2",
+  "feature_names": [
+    "amount_log1p",
+    "transaction_type_cash_in",
+    "transaction_type_cash_out",
+    "transaction_type_debit",
+    "transaction_type_payment",
+    "transaction_type_transfer",
+    "dest_tx_count_log1p_24h",
+    "dest_tx_count_log1p_168h",
+    "dest_amount_sum_log1p_24h",
+    "dest_amount_sum_log1p_168h",
+    "dest_unique_origins_log1p_24h",
+    "dest_unique_origins_log1p_168h",
+    "dest_hours_since_previous_activity",
+    "dest_history_available",
+    "amount_log_ratio_to_dest_mean_168h",
+    "dest_cash_in_count_log1p_24h",
+    "dest_cash_out_count_log1p_24h",
+    "dest_debit_count_log1p_24h",
+    "dest_payment_count_log1p_24h",
+    "dest_transfer_count_log1p_24h"
+  ],
+  "input_boundary": "model_ready_features_prepared_upstream",
+  "model_file": "model.joblib",
+  "model_sha256": "4998c7a86fbef98a4b352ffad8d7fbf2ab3525b204a0f4ca9287d108492a75f1",
+  "model_version": "paysim_fraud_model_v2_tuned_review",
+  "package_versions": {
+    "joblib": "1.4.2",
+    "numpy": "2.2.6",
+    "pandas": "2.2.2",
+    "scikit-learn": "1.5.1",
+    "xgboost": "2.1.4"
+  },
+  "selected_model": "xgboost_high_child_weight",
+  "selected_run_id": "acd17ad55f8e4c2a85d0afedb3608a04"
+}
