@@ -1,21 +1,104 @@
-MIT License
+FINANCIAL FRAUD INTELLIGENCE PLATFORM EVALUATION LICENSE
+Version 1.0
 
-Copyright (c) 2026 Zusiphe Mzazela
+Copyright (c) 2026 Zusiphe Mzazela. All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+1. Scope
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+This license applies only to the original source code, SQL, configuration,
+fictional policy materials, documentation, and screenshots authored by Zusiphe
+Mzazela for the Financial Fraud Intelligence Platform (the "Licensed Work").
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+It does not apply to third-party software, datasets, model weights, container
+images, trademarks, or other material identified as separately licensed in this
+repository. In particular, the PaySim dataset and the approved model derived
+from it are excluded from the Licensed Work and remain subject to the terms
+identified in the repository's attribution and third-party notices.
+
+2. Evaluation Permission
+
+Subject to this license, you are granted a limited, non-exclusive, worldwide,
+royalty-free, non-transferable, and non-sublicensable permission to:
+
+a. view and inspect the Licensed Work;
+b. clone or download reasonable copies of the Licensed Work;
+c. install and run the Licensed Work locally; and
+d. make private, local modifications strictly necessary to configure, test,
+   study, or evaluate the Licensed Work.
+
+These permissions may be exercised only for personal learning, technical
+evaluation, portfolio review, recruitment or hiring assessment, academic
+assessment, or internal security, compatibility, or code review. Evaluation by
+a commercial organisation for recruitment, hiring, or technical assessment is
+permitted and is not considered Commercial Use under this license.
+
+3. Restrictions
+
+Except with the copyright holder's prior written permission, you may not:
+
+a. use the Licensed Work in production or for business operations;
+b. use the Licensed Work for commercial advantage, compensation, revenue
+   generation, paid consulting, or delivery of services to a third party;
+c. incorporate the Licensed Work or a substantial portion of it into a
+   commercial product, service, platform, hosted offering, internal operational
+   system, or distributed codebase;
+d. sell, rent, lease, sublicense, publish, redistribute, rehost, mirror, or
+   otherwise transfer the Licensed Work or a substantial portion of it;
+e. provide the Licensed Work or a substantial portion of it as a hosted or
+   software-as-a-service offering;
+f. remove or obscure copyright, license, attribution, or provenance notices;
+g. claim authorship of the Licensed Work; or
+h. use the project name, branding, or the copyright holder's identity to imply
+   endorsement.
+
+You may link to the original repository and discuss, quote, or review limited
+portions of the Licensed Work where otherwise permitted by law. Private local
+modifications permitted by Section 2 may not be published or redistributed.
+
+4. Separately Licensed Materials
+
+The following are not licensed under this Evaluation License and remain governed
+by their respective terms:
+
+a. PaySim1 data and the approved scoring model derived from PaySim1;
+b. third-party libraries and tools, including XGBoost;
+c. the sentence-transformers/all-MiniLM-L6-v2 embedding model;
+d. Meta Llama models obtained through Ollama; and
+e. any material carrying its own license or notice.
+
+See THIRD_PARTY_NOTICES.md and docs/DATASET_AND_MODEL_ATTRIBUTION.md for details.
+
+5. Ownership and Additional Permission
+
+The Licensed Work is licensed, not sold. The copyright holder retains all right,
+title, and interest in the Licensed Work. No right is granted by implication.
+Commercial use, redistribution, publication of modified versions, or any use
+outside Section 2 requires a separate written license from the copyright holder.
+
+6. Termination
+
+This license terminates automatically if you breach any of its terms. Upon
+termination, you must stop using the Licensed Work and delete copies under your
+control, except where retention is required by law. Sections concerning
+ownership, disclaimers, liability, and separately licensed materials survive
+termination.
+
+7. Disclaimer of Warranty
+
+THE LICENSED WORK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+A PARTICULAR PURPOSE, ACCURACY, SECURITY, AND NON-INFRINGEMENT. THIS IS A
+PORTFOLIO AND LEARNING SYSTEM, NOT A PRODUCTION-APPROVED FRAUD DECISION SYSTEM.
+
+8. Limitation of Liability
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE COPYRIGHT HOLDER SHALL NOT BE LIABLE
+FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM OR RELATED TO THE
+LICENSED WORK OR ITS USE, WHETHER IN CONTRACT, TORT, OR OTHERWISE.
+
+9. General
+
+If any provision is unenforceable, the remaining provisions remain in effect.
+Failure to enforce a provision is not a waiver. This license grants only the
+permissions stated expressly. By exercising permissions under this license, you
+accept its terms.
