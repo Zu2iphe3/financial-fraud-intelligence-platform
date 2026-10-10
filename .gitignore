@@ -169,9 +169,17 @@ data/processed/*
 # Local project specification
 docs/Financial_Fraud_Intelligence_Platform_Project_Plan.pdf
 
-# Local service state and model artifacts
+# Local service state and generated model artifacts
 mlruns/
-artifacts/
+# Keep training runs, reviews, and alternative models local while versioning only
+# the small approved scoring bundle required for reproducible inference.
+artifacts/*
+!artifacts/models/
+artifacts/models/*
+!artifacts/models/paysim_fraud_model_v2_scoring/
+artifacts/models/paysim_fraud_model_v2_scoring/*
+!artifacts/models/paysim_fraud_model_v2_scoring/model.joblib
+!artifacts/models/paysim_fraud_model_v2_scoring/model_manifest.json
 chroma_db/
 airflow/logs/
 airflow/config/

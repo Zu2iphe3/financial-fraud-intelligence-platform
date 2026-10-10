@@ -5,8 +5,8 @@ airflow/**
 !airflow/Dockerfile
 !airflow/requirements.txt
 
-# PH8-01 builds application code and committed contracts into the scoring image.
-# The generated model remains excluded and is mounted read-only at runtime.
+# Build application code and committed contracts into the scoring image. The versioned
+# approved model remains outside image history and is mounted read-only at runtime.
 !api/
 !api/**
 !src/

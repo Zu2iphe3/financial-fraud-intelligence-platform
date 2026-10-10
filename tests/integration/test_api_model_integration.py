@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 from sklearn.linear_model import LogisticRegression
 
 from src.api.app import create_app
+from src.api.config import load_api_settings
 from src.api.model_service import PredictionService
 from src.models.scoring_artifact import ScoringModelBundle, save_scoring_bundle
 
@@ -42,3 +43,18 @@ def test_persisted_model_loads_and_scores_through_http(
     assert prediction.status_code == 200
     assert 0 <= prediction.json()["fraud_probability"] <= 1
     assert prediction.json()["model_version"] == api_settings.model_version
+
+
+def test_versioned_approved_model_scores_through_http(model_ready_payload):
+    """Prove a clean checkout can serve the approved model without MLflow state."""
+    settings = load_api_settings()
+
+    with TestClient(create_app(settings=settings)) as client:
+        ready = client.get("/health/ready")
+        prediction = client.post("/v1/predictions", json=model_ready_payload)
+
+    assert ready.status_code == 200
+    assert ready.json()["prediction_available"] is True
+    assert prediction.status_code == 200
+    assert 0 <= prediction.json()["fraud_probability"] <= 1
+    assert prediction.json()["model_version"] == "paysim_fraud_model_v2_tuned_review"
