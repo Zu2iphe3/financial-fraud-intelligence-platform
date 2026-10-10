@@ -180,6 +180,7 @@ artifacts/models/*
 artifacts/models/paysim_fraud_model_v2_scoring/*
 !artifacts/models/paysim_fraud_model_v2_scoring/model.joblib
 !artifacts/models/paysim_fraud_model_v2_scoring/model_manifest.json
+!artifacts/models/paysim_fraud_model_v2_scoring/NOTICE.md
 chroma_db/
 airflow/logs/
 airflow/config/

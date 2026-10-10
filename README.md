@@ -239,6 +239,13 @@ The raw PaySim CSV is not redistributed. Obtain it from the
 PaySim and the derived approved model are attributed separately in
 [Dataset and model attribution](docs/DATASET_AND_MODEL_ATTRIBUTION.md).
 
-Original project source code and original documentation are licensed under the
-[MIT License](LICENSE). Third-party datasets, derived artifacts, libraries, and tools
-remain subject to their respective terms.
+The repository owner's original code and documentation are provided under the
+[Financial Fraud Intelligence Platform Evaluation License](LICENSE). It permits
+recruiters and technical reviewers to view, clone, install, run, and evaluate the
+project locally, but does not grant commercial-use or redistribution rights.
+
+PaySim, the approved model derived from it, third-party libraries, embedding and
+language models, and container images remain under their own terms. See
+[Dataset and model attribution](docs/DATASET_AND_MODEL_ATTRIBUTION.md) and
+[Third-party notices](THIRD_PARTY_NOTICES.md). Earlier repository versions released
+under MIT remain governed by the license supplied with those versions.
