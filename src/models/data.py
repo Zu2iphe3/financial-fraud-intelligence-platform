@@ -27,8 +27,14 @@ class PartitionData:
 
 
 def contract_sha256(path: str | Path) -> str:
-    """Identify the exact reviewed feature contract used by a model run."""
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    """Identify reviewed contract content independently of platform newlines.
+
+    Git may materialize the same text file with LF or CRLF line endings. Normalizing
+    only those transport-level bytes keeps the identity stable across operating
+    systems while every meaningful JSON byte remains protected by the checksum.
+    """
+    content = Path(path).read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(content).hexdigest()
 
 
 def load_dataset_manifest(dataset_root: str | Path) -> dict[str, Any]:

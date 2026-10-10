@@ -1,5 +1,5 @@
 {
-  "feature_contract_sha256": "afa2cb8a80b58bccb77cb6a24eeb97880076caf6ff7593a733fd6c057ca0aa8f",
+  "feature_contract_sha256": "6ed53e0caee1d2f4cb974090063f551a2b351d6dcbabc901a4e0f0d49014df8e",
   "feature_contract_version": "paysim_features_v2",
   "feature_names": [
     "amount_log1p",
@@ -25,7 +25,7 @@
   ],
   "input_boundary": "model_ready_features_prepared_upstream",
   "model_file": "model.joblib",
-  "model_sha256": "cecaa5d16f5aaf33252a64a7e7eaa8a6c8c165017327f4154a6a8e7444421935",
+  "model_sha256": "4998c7a86fbef98a4b352ffad8d7fbf2ab3525b204a0f4ca9287d108492a75f1",
   "model_version": "paysim_fraud_model_v2_tuned_review",
   "package_versions": {
     "joblib": "1.4.2",
